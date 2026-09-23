@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEBRA MAXIMUM — Minecraft сервер</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#29ABE2;
+  --blue-light:#5cc4f0;
+  --yellow:#FFE500;
+  --yellow-glow:#FFD400;
+  --bg:#080b14;
+  --bg2:#0d1220;
+  --card:rgba(255,255,255,0.04);
+  --card-hover:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);
+  --border-glow:rgba(41,171,226,0.4);
+  --text:#ffffff;
+  --muted:#8892a6;
+  --green:#4ade80;
+  --red:#ff5252;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(41,171,226,0.18), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 100%, rgba(255,229,0,0.1), transparent 55%),
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(41,171,226,0.05), transparent 60%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+}
+
+/* HEADER */
+header{
+  position:fixed;top:0;left:0;right:0;
+  padding:14px 40px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(8,11,20,0.65);
+  backdrop-filter:blur(20px) saturate(150%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  z-index:100;
+  border-bottom:1px solid var(--border);
+  transition:.3s;
+}
+header.scrolled{padding:8px 40px;background:rgba(8,11,20,0.88);box-shadow:0 8px 40px rgba(0,0,0,.5)}
+
+.logo-wrap{
+  display:flex;align-items:center;gap:14px;cursor:pointer;
+  transition:.3s;
+}
+.logo-wrap:hover{transform:scale(1.03)}
+.logo-banner{
+  height:48px;width:auto;display:block;
+  filter:drop-shadow(0 4px 20px rgba(255,229,0,.35)) drop-shadow(0 0 15px rgba(41,171,226,.3));
+  transition:.3s;
+  border-radius:6px;
+}
+.logo-wrap:hover .logo-banner{filter:drop-shadow(0 6px 30px rgba(255,229,0,.55)) drop-shadow(0 0 20px rgba(41,171,226,.5))}
+.logo-fallback{
+  display:none;font-family:'Bungee',cursive;font-size:18px;
+  color:var(--yellow);
+  text-shadow:
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+    0 0 25px rgba(255,229,0,.5);
+  letter-spacing:1px;
+}
+.logo-banner.hidden + .logo-fallback{display:block}
+
+nav{display:flex;gap:30px;align-items:center}
+nav a{
+  color:var(--muted);text-decoration:none;font-weight:600;
+  font-size:14px;transition:.25s;position:relative;padding:4px 0;
+}
+nav a:hover{color:var(--text)}
+nav a::after{
+  content:'';position:absolute;bottom:0;left:0;
+  width:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--yellow));
+  transition:.3s;border-radius:2px;
+}
+nav a:hover::after{width:100%}
+
+.btn{
+  background:linear-gradient(135deg,var(--yellow),var(--yellow-glow));
+  color:#080b14;
+  padding:11px 24px;border-radius:10px;
+  font-weight:800;border:none;cursor:pointer;
+  transition:.25s;text-decoration:none;display:inline-block;
+  font-size:14px;letter-spacing:.3px;
+  box-shadow:0 4px 20px rgba(255,229,0,.3), inset 0 1px 0 rgba(255,255,255,.5);
+}
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(255,229,0,.5), inset 0 1px 0 rgba(255,255,255,.5);
+}
+.btn-outline{
+  background:transparent;color:var(--yellow);
+  border:2px solid rgba(255,229,0,.5);
+  box-shadow:none;
+}
+.btn-outline:hover{
+  background:rgba(255,229,0,.1);
+  border-color:var(--yellow);
+  box-shadow:0 8px 30px rgba(255,229,0,.15);
+}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  text-align:center;
+  padding:140px 20px 80px;
+  position:relative;
+  overflow:hidden;
+}
+
+.particle{
+  position:absolute;
+  width:4px;height:4px;
+  background:var(--yellow);
+  border-radius:50%;
+  box-shadow:0 0 12px var(--yellow);
+  opacity:0;pointer-events:none;
+  animation:rise 8s ease-in infinite;
+}
+@keyframes rise{
+  0%{opacity:0;transform:translateY(0) scale(0)}
+  10%{opacity:.9}
+  90%{opacity:.9}
+  100%{opacity:0;transform:translateY(-100vh) scale(1.5)}
+}
+
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(41,171,226,0.08);
+  border:1px solid rgba(41,171,226,.3);
+  color:var(--blue-light);
+  padding:8px 20px;border-radius:100px;
+  font-size:13px;font-weight:700;
+  margin-bottom:32px;
+  backdrop-filter:blur(10px);
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px var(--green), 0 0 0 0 rgba(74,222,128,.6);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 12px var(--green), 0 0 0 0 rgba(74,222,128,.6)}
+  70%{box-shadow:0 0 12px var(--green), 0 0 0 10px rgba(74,222,128,0)}
+  100%{box-shadow:0 0 12px var(--green), 0 0 0 0 rgba(74,222,128,0)}
+}
+
+/* SQUARE HERO LOGO */
+.hero-logo{
+  position:relative;
+  margin-bottom:28px;
+  width:min(340px, 68vw);
+  animation:logoFloat 6s ease-in-out infinite;
+}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+.hero-logo-inner{
+  position:relative;
+  aspect-ratio:1/1;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:
+    0 30px 80px rgba(41,171,226,.4),
+    0 0 60px rgba(255,229,0,.25),
+    inset 0 0 0 2px rgba(255,255,255,.1);
+}
+.hero-logo-inner::before{
+  content:'';position:absolute;inset:-2px;z-index:2;border-radius:30px;
+  background:linear-gradient(135deg,var(--blue),var(--yellow),var(--blue));
+  background-size:200% 200%;
+  animation:borderRotate 4s linear infinite;
+  padding:2px;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  opacity:.7;
+  pointer-events:none;
+}
+@keyframes borderRotate{
+  0%{background-position:0% 50%}
+  100%{background-position:200% 50%}
+}
+.hero-logo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+
+.hero-logo-text{
+  font-family:'Bungee',cursive;
+  font-size:clamp(38px,9vw,88px);
+  line-height:1;
+  color:var(--yellow);
+  letter-spacing:3px;
+  text-shadow:
+    -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000,
+    6px 6px 0 rgba(0,0,0,.5),
+    0 0 60px rgba(255,229,0,.5);
+  display:none;
+}
+.hero-logo-inner.hidden{display:none}
+.hero-logo-inner.hidden + .hero-logo-text{display:block}
+
+.hero p.subtitle{
+  font-size:clamp(15px,1.7vw,18px);
+  color:var(--muted);
+  max-width:660px;
+  margin:8px 0 40px;
+  font-weight:500;
+}
+.hero p.subtitle b{color:var(--yellow);font-weight:700}
+.hero p.subtitle strong{
+  background:linear-gradient(90deg,var(--blue-light),var(--yellow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;font-weight:800;
+}
+
+.ip-box{
+  display:inline-flex;align-items:center;gap:16px;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:14px 24px;
+  border-radius:14px;
+  margin-bottom:14px;
+  cursor:pointer;
+  transition:.3s;
+  position:relative;
+  backdrop-filter:blur(20px);
+  box-shadow:0 8px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.ip-box:hover{
+  border-color:var(--yellow);
+  background:var(--card-hover);
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(255,229,0,.15), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.ip-icon{font-size:22px}
+.ip-label{
+  font-size:10px;color:var(--muted);text-align:left;
+  font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;
+}
+.ip-value{
+  font-family:'Bungee',cursive;font-size:15px;
+  color:var(--yellow);letter-spacing:1px;
+  text-shadow:0 0 20px rgba(255,229,0,.5);
+}
+.copied{
+  position:absolute;top:-48px;left:50%;
+  transform:translateX(-50%) translateY(10px) scale(.9);
+  background:var(--green);color:#080b14;
+  padding:8px 16px;border-radius:8px;
+  font-size:12px;font-weight:800;
+  opacity:0;transition:.35s;pointer-events:none;
+  white-space:nowrap;
+  box-shadow:0 8px 20px rgba(74,222,128,.4);
+}
+.copied.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+
+.port-hint{
+  font-size:13px;color:var(--muted);
+  margin-bottom:36px;font-weight:600;
+}
+.port-hint b{
+  color:var(--blue-light);
+  background:rgba(41,171,226,.1);
+  padding:3px 10px;border-radius:6px;
+  border:1px solid rgba(41,171,226,.25);
+  font-family:'Bungee',cursive;
+  font-size:12px;letter-spacing:1px;
+}
+
+.hero-buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+.stats{
+  display:flex;gap:0;flex-wrap:wrap;justify-content:center;
+  margin-top:80px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:8px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.stat{padding:20px 34px;position:relative}
+.stat:not(:last-child)::after{
+  content:'';position:absolute;right:0;top:20%;bottom:20%;
+  width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.1),transparent);
+}
+.stat h3{
+  font-family:'Bungee',cursive;
+  font-size:24px;
+  background:linear-gradient(135deg,var(--yellow),var(--blue-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:4px;letter-spacing:1px;
+}
+.stat p{
+  font-size:11px;color:var(--muted);
+  letter-spacing:2px;font-weight:700;
+  text-transform:uppercase;
+}
+
+/* SECTIONS */
+section{padding:120px 40px;max-width:1240px;margin:0 auto;position:relative}
+.section-title{text-align:center;margin-bottom:70px}
+.section-eyebrow{
+  display:inline-block;
+  font-size:12px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;
+  color:var(--blue-light);
+  margin-bottom:16px;
+  padding:6px 16px;
+  background:rgba(41,171,226,.08);
+  border:1px solid rgba(41,171,226,.2);
+  border-radius:100px;
+}
+.section-title h2{
+  font-family:'Bungee',cursive;
+  font-size:clamp(28px,4.5vw,50px);
+  margin-bottom:18px;
+  line-height:1.1;
+  letter-spacing:2px;
+}
+.section-title h2 .accent{
+  background:linear-gradient(135deg,var(--yellow),var(--yellow-glow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  position:relative;
+}
+.section-title h2 .accent::after{
+  content:'';position:absolute;left:0;right:0;bottom:-6px;height:4px;
+  background:linear-gradient(90deg,transparent,var(--yellow),transparent);
+  border-radius:4px;
+  filter:blur(2px);
+}
+.section-title p{color:var(--muted);font-size:16px;max-width:600px;margin:0 auto;font-weight:500}
+
+.glass{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;
+  transition:.35s cubic-bezier(.2,.9,.3,1.3);
+  box-shadow:0 4px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.glass::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+}
+.glass:hover{
+  transform:translateY(-6px);
+  border-color:var(--border-glow);
+  background:var(--card-hover);
+  box-shadow:0 20px 50px rgba(0,0,0,.5), 0 0 40px rgba(41,171,226,.1), inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* ABOUT */
+.about-card{
+  max-width:900px;margin:0 auto;
+  padding:50px 40px;text-align:center;
+}
+.about-card p{
+  color:var(--muted);font-size:17px;line-height:1.85;
+  margin-bottom:20px;
+}
+.about-card p b{color:var(--yellow);font-weight:700}
+.about-quote{
+  font-family:'Bungee',cursive;
+  font-size:15px;line-height:1.7;
+  letter-spacing:1px;
+  padding:28px 20px;margin:36px 0 0;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(255,229,0,.08), rgba(41,171,226,.08));
+  border:1px solid rgba(255,229,0,.2);
+  color:var(--yellow);
+  text-shadow:0 0 30px rgba(255,229,0,.3);
+  position:relative;
+}
+
+/* FEATURES */
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:22px;
+}
+.feature{padding:32px 28px;position:relative}
+.feature-icon{
+  width:60px;height:60px;
+  background:linear-gradient(135deg, rgba(41,171,226,.15), rgba(255,229,0,.08));
+  border:1px solid rgba(41,171,226,.2);
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin-bottom:22px;
+  transition:.35s;
+}
+.feature:hover .feature-icon{
+  transform:scale(1.1) rotate(-5deg);
+  border-color:var(--yellow);
+  box-shadow:0 0 30px rgba(255,229,0,.25);
+}
+.feature h3{
+  font-family:'Bungee',cursive;
+  font-size:16px;margin-bottom:12px;
+  letter-spacing:.5px;
+}
+.feature p{color:var(--muted);font-size:14.5px;line-height:1.7}
+
+/* PC / STATUS */
+.pc-wrap{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:50px;align-items:center;
+  perspective:1400px;
+}
+.pc-tower{
+  position:relative;width:100%;max-width:320px;margin:0 auto;
+  aspect-ratio:1/1.35;
+  transition:transform .6s cubic-bezier(.2,.9,.3,1.3);
+  transform-style:preserve-3d;
+}
+.pc-tower:hover{transform:rotateY(-10deg) rotateX(6deg)}
+.pc-glass{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,#0a0f18,#050810);
+  border-radius:18px;
+  border:1px solid rgba(41,171,226,.25);
+  overflow:hidden;
+  box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 60px rgba(41,171,226,.15),inset 0 0 40px rgba(0,0,0,.9);
+}
+.pc-glass::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);
+  pointer-events:none;
+}
+.pc-rgb{
+  position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,#ff00e0,#00fff0,#ff00e0,#00fff0,#ff00e0);
+  background-size:200% 100%;
+  animation:rgbMove 3s linear infinite;
+  box-shadow:0 0 25px rgba(255,0,224,.9),0 0 40px rgba(0,255,240,.7);
+  transition:.4s;
+  border-radius:18px 18px 0 0;
+}
+.pc-tower.offline .pc-rgb{background:#333;animation:none;box-shadow:none}
+@keyframes rgbMove{from{background-position:0 0}to{background-position:200% 0}}
+
+.pc-mobo{
+  position:absolute;inset:22px;
+  background:linear-gradient(135deg,#0d1520,#132030);
+  border-radius:12px;border:1px solid rgba(41,171,226,.15);
+  padding:16px;
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.fan{
+  aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,#0a0f18 30%,#1a2535 70%);
+  border:1px solid #223245;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.fan-blades{
+  width:85%;height:85%;border-radius:50%;
+  animation:spin 1.5s linear infinite;
+  position:relative;transition:.3s;
+}
+.fan-blades::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0deg 60deg,#29ABE2 60deg 90deg,transparent 90deg 180deg,#FFE500 180deg 210deg,transparent 210deg 300deg,#29ABE2 300deg 330deg,transparent 330deg);
+  filter:blur(1.5px);opacity:.9;
+}
+.fan::after{
+  content:'';position:absolute;width:22%;height:22%;
+  border-radius:50%;background:#0a0f18;
+  border:1px solid var(--blue);z-index:2;
+  box-shadow:0 0 10px var(--blue);
+}
+.pc-tower.offline .fan-blades{animation-play-state:paused;opacity:.3}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.gpu{
+  grid-column:span 2;height:58px;
+  background:linear-gradient(135deg,#1a2535,#0f1825);
+  border-radius:10px;border:1px solid #223245;
+  display:flex;align-items:center;padding:0 16px;gap:10px;
+}
+.gpu-led{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px var(--green);
+  animation:blink 1.2s infinite;
+}
+.gpu-led:nth-child(2){animation-delay:.4s;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+.gpu-led:nth-child(3){animation-delay:.8s;background:var(--yellow);box-shadow:0 0 12px var(--yellow)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.pc-tower.offline .gpu-led{background:#333;box-shadow:none;animation:none}
+
+.ram{grid-column:span 2;height:24px;display:flex;gap:6px}
+.ram span{
+  flex:1;background:linear-gradient(180deg,#2a3a52,#1a2535);
+  border-radius:3px;position:relative;overflow:hidden;
+}
+.ram span::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,229,0,.8),transparent);
+  transform:translateX(-100%);
+  animation:ramScan 2s infinite;
+}
+.ram span:nth-child(2)::before{animation-delay:.3s}
+.ram span:nth-child(3)::before{animation-delay:.6s}
+.ram span:nth-child(4)::before{animation-delay:.9s}
+@keyframes ramScan{to{transform:translateX(100%)}}
+.pc-tower.offline .ram span::before{animation:none;opacity:.2}
+
+.pc-front{
+  position:absolute;top:0;right:-18px;bottom:0;width:18px;
+  background:linear-gradient(180deg,#1a2535,#0f1825);
+  border-radius:0 12px 12px 0;
+  border:1px solid rgba(41,171,226,.25);border-left:none;
+  padding:22px 0;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.pc-power{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 15px var(--green);
+  transition:.3s;
+}
+.pc-tower.offline .pc-power{background:var(--red);box-shadow:0 0 15px var(--red)}
+.pc-vent{width:8px;height:22px;background:#0a0f18;border-radius:4px}
+.pc-stand{
+  position:absolute;bottom:-18px;left:20%;right:20%;height:18px;
+  background:linear-gradient(180deg,#1a2535,#0a0f18);
+  border-radius:0 0 14px 14px;
+  border:1px solid rgba(41,171,226,.15);border-top:none;
+}
+
+/* MONITOR */
+.monitor{position:relative}
+.monitor-frame{
+  background:linear-gradient(135deg,#1a2535,#0f1825);
+  border:1px solid rgba(41,171,226,.25);
+  border-radius:20px;padding:18px;
+  box-shadow:0 30px 60px rgba(0,0,0,.6), 0 0 60px rgba(41,171,226,.12);
+}
+.monitor-screen{
+  background:linear-gradient(180deg,#0a0f18,#06101a);
+  border-radius:12px;padding:22px;
+  min-height:460px;
+  font-family:'Courier New',monospace;
+  border:1px solid rgba(41,171,226,.2);
+  position:relative;overflow:hidden;
+}
+.monitor-screen::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(41,171,226,.04) 0 1px,transparent 1px 3px);
+  pointer-events:none;z-index:2;
+}
+.screen-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:16px;
+  border-bottom:1px solid rgba(41,171,226,.25);
+  margin-bottom:20px;
+  font-size:12px;font-weight:800;letter-spacing:.5px;
+  color:var(--blue-light);
+  position:relative;z-index:3;
+  flex-wrap:wrap;gap:8px;
+}
+.screen-status{
+  color:var(--yellow);font-weight:900;
+  transition:.3s;font-family:'Bungee',cursive;
+  letter-spacing:1px;font-size:11px;
+}
+.screen-status.online{color:var(--green);text-shadow:0 0 12px var(--green)}
+.screen-status.offline{color:var(--red);text-shadow:0 0 12px var(--red)}
+
+.screen-body{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin-bottom:20px;
+  position:relative;z-index:3;
+}
+.metric{
+  background:rgba(41,171,226,.06);
+  border:1px solid rgba(41,171,226,.18);
+  border-radius:10px;padding:14px 16px;
+  transition:.3s;
+}
+.metric:hover{background:rgba(41,171,226,.1);border-color:rgba(41,171,226,.35)}
+.metric-full{grid-column:span 2}
+.metric-label{
+  display:block;font-size:10px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;
+  margin-bottom:6px;font-weight:800;
+}
+.metric-value{
+  font-size:15px;color:var(--yellow);font-weight:800;
+  font-family:'Courier New',monospace;word-break:break-word;
+  text-shadow:0 0 12px rgba(255,229,0,.4);
+}
+.metric-value.online{color:var(--green);text-shadow:0 0 12px rgba(74,222,128,.5)}
+.metric-value.offline{color:var(--red);text-shadow:0 0 12px rgba(255,82,82,.5)}
+
+.progress-bar-wrap{margin-top:6px;position:relative;z-index:3}
+.progress-label{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--muted);
+  margin-bottom:8px;font-weight:700;letter-spacing:.5px;
+}
+.progress-bar{
+  height:8px;background:rgba(41,171,226,.12);
+  border-radius:100px;overflow:hidden;
+  border:1px solid rgba(41,171,226,.2);
+}
+.progress-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--blue),var(--yellow));
+  transition:width .8s ease;
+  box-shadow:0 0 20px rgba(255,229,0,.6);
+  border-radius:100px;
+}
+.screen-log{
+  margin-top:20px;padding-top:16px;
+  border-top:1px solid rgba(41,171,226,.2);
+  font-size:11px;color:var(--muted);
+  font-family:'Courier New',monospace;
+  max-height:120px;overflow:hidden;
+  position:relative;z-index:3;
+  line-height:1.8;
+}
+.screen-log div{animation:fadeIn .3s}
+.screen-log div span{color:var(--green)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+
+.monitor-stand{
+  width:80px;height:38px;
+  background:linear-gradient(180deg,#1a2535,#0f1825);
+  margin:0 auto;
+  clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);
+  border-left:1px solid rgba(41,171,226,.2);
+  border-right:1px solid rgba(41,171,226,.2);
+}
+.monitor-base{
+  width:200px;height:12px;
+  background:linear-gradient(180deg,#1a2535,#0a0f18);
+  border-radius:0 0 100px 100px;
+  margin:0 auto;
+  border:1px solid rgba(41,171,226,.15);border-top:none;
+}
+
+/* STEPS */
+.steps{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:22px;
+}
+.step{padding:36px 26px;text-align:center;position:relative}
+.step-num{
+  width:58px;height:58px;
+  background:linear-gradient(135deg,var(--yellow),var(--yellow-glow));
+  color:#080b14;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bungee',cursive;font-size:22px;
+  margin:0 auto 22px;
+  box-shadow:0 10px 30px rgba(255,229,0,.35), inset 0 1px 0 rgba(255,255,255,.5);
+  transform:rotate(-3deg);transition:.3s;
+}
+.step:hover .step-num{transform:rotate(3deg) scale(1.1)}
+.step h3{
+  font-family:'Bungee',cursive;font-size:15px;
+  margin-bottom:12px;letter-spacing:.5px;color:var(--yellow);
+}
+.step p{color:var(--muted);font-size:14.5px;line-height:1.7}
+.step p b{color:var(--blue-light);font-weight:800}
+
+/* RULES */
+.rules{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:18px;
+}
+.rule{
+  padding:24px 26px;
+  display:flex;gap:18px;align-items:flex-start;
+}
+.rule-icon{
+  font-size:24px;flex-shrink:0;margin-top:2px;
+  width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(41,171,226,.15),rgba(255,229,0,.08));
+  border:1px solid rgba(41,171,226,.2);
+  border-radius:12px;transition:.3s;
+}
+.rule:hover .rule-icon{border-color:var(--yellow);transform:scale(1.05)}
+.rule h4{font-size:15px;margin-bottom:6px;color:var(--text);font-weight:800}
+.rule p{color:var(--muted);font-size:13.5px;line-height:1.65}
+
+/* SOCIALS */
+.socials-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+.social{
+  padding:34px 24px;text-align:center;
+  text-decoration:none;color:var(--text);display:block;
+}
+.social-icon{
+  font-size:40px;margin-bottom:18px;display:block;
+  filter:drop-shadow(0 4px 20px rgba(41,171,226,.4));
+  transition:.35s;
+}
+.social:hover .social-icon{transform:scale(1.15) translateY(-4px)}
+.social h3{
+  font-family:'Bungee',cursive;font-size:16px;
+  margin-bottom:8px;color:var(--yellow);letter-spacing:.5px;
+}
+.social p{color:var(--muted);font-size:13px;word-break:break-all;font-weight:600}
+
+/* FOOTER */
+footer{
+  padding:60px 40px 30px;
+  border-top:1px solid var(--border);
+  background:rgba(0,0,0,.3);
+  backdrop-filter:blur(20px);
+  position:relative;
+}
+footer::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent);
+  filter:blur(1px);
+}
+.footer-content{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:2fr 1fr 1fr;
+  gap:48px;margin-bottom:40px;
+}
+.footer-logo-wrap{
+  margin-bottom:18px;display:flex;align-items:center;gap:12px;
+}
+.footer-logo-img{
+  height:42px;width:auto;
+  filter:drop-shadow(0 4px 15px rgba(255,229,0,.25));
+  border-radius:4px;
+}
+.footer-logo-text{
+  display:none;font-family:'Bungee',cursive;font-size:16px;
+  color:var(--yellow);
+  text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 0 20px rgba(255,229,0,.4);
+  letter-spacing:1px;
+}
+.footer-logo-img.hidden + .footer-logo-text{display:block}
+.footer-content > div p{color:var(--muted);font-size:14px;line-height:1.7}
+.footer-col h4{
+  font-size:12px;margin-bottom:18px;color:var(--text);
+  letter-spacing:2px;text-transform:uppercase;font-weight:800;
+}
+.footer-col a{
+  display:block;color:var(--muted);text-decoration:none;
+  font-size:14px;padding:6px 0;transition:.25s;font-weight:500;
+}
+.footer-col a:hover{color:var(--yellow);padding-left:8px}
+.footer-bottom{
+  text-align:center;padding-top:30px;
+  border-top:1px solid var(--border);
+  color:var(--muted);font-size:13px;
+  max-width:1200px;margin:0 auto;
+}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:.9s cubic-bezier(.2,.9,.3,1)}
+.reveal.active{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media(max-width:1000px){
+  .pc-wrap{grid-template-columns:1fr;gap:60px}
+  .pc-tower{max-width:280px}
+}
+@media(max-width:768px){
+  header{padding:10px 14px}
+  .logo-banner{height:36px}
+  .logo-fallback{font-size:12px}
+  nav{display:none}
+  section{padding:80px 18px}
+  .hero{padding:120px 18px 60px}
+  .footer-content{grid-template-columns:1fr;gap:36px}
+  .stats{gap:0;margin-top:60px;padding:4px}
+  .stat{padding:16px 18px;flex:1 1 45%}
+  .stat:nth-child(2)::after{display:none}
+  .stat h3{font-size:18px}
+  .stat p{font-size:10px;letter-spacing:1px}
+  .hero-buttons{flex-direction:column;width:100%;max-width:320px}
+  .hero-buttons .btn{width:100%;text-align:center}
+  .ip-box{flex-direction:row;gap:10px;padding:12px 16px;width:100%;max-width:340px}
+  .ip-value{font-size:11px}
+  .about-quote{font-size:11px;padding:22px 14px;letter-spacing:.5px}
+  .about-card{padding:34px 22px}
+  footer{padding:50px 18px 24px}
+  .screen-body{grid-template-columns:1fr}
+  .metric-full{grid-column:span 1}
+  .monitor-screen{min-height:auto;padding:16px}
+  .section-title h2{letter-spacing:1px}
+  .hero-logo{width:min(280px, 72vw)}
+}
+</style>
+</head>
+<body>
+
+<header id="header">
+  <div class="logo-wrap">
+    <!-- Баннер SVG в шапке -->
+    <img src="logo-banner.svg" alt="BEBRA MAXIMUM" class="logo-banner" onerror="this.classList.add('hidden')">
+    <span class="logo-fallback">BEBRA-MAXIMUM</span>
+  </div>
+  <nav>
+    <a href="#about">О сервере</a>
+    <a href="#features">Особенности</a>
+    <a href="#status">Статус</a>
+    <a href="#join">Как играть</a>
+    <a href="#rules">Правила</a>
+    <a href="#socials">Контакты</a>
+  </nav>
+  <a href="#join" class="btn">Играть</a>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="particle" style="left:10%;animation-delay:0s"></div>
+  <div class="particle" style="left:25%;animation-delay:2s"></div>
+  <div class="particle" style="left:45%;animation-delay:4s"></div>
+  <div class="particle" style="left:65%;animation-delay:1s"></div>
+  <div class="particle" style="left:80%;animation-delay:3s"></div>
+  <div class="particle" style="left:92%;animation-delay:5s"></div>
+
+  <div class="badge">
+    <span class="dot"></span>
+    Сервер онлайн · Кросс-платформа
+  </div>
+
+  <!-- Квадратный SVG-логотип в hero -->
+  <div class="hero-logo">
+    <div class="hero-logo-inner">
+      <img src="logo-square.svg" alt="BEBRA MAXIMUM" onerror="this.parentElement.classList.add('hidden')">
+    </div>
+    <div class="hero-logo-text">BEBRA-MAXIMUM</div>
+  </div>
+
+  <p class="subtitle">
+    ❤️ Салам, джигитер! <b>Самый лучший кросс-платформенный сервер</b> — играй как с телефона, так и с ПК. <strong>Уютная майнкрафт-деревня</strong>, ивенты, квесты и прокачка навыков.
+  </p>
+
+  <div class="ip-box" onclick="copyIP(this)">
+    <span class="ip-icon">🎮</span>
+    <div>
+      <div class="ip-label">IP сервера</div>
+      <div class="ip-value" id="serverIP">bebra-maximum.ru</div>
+    </div>
+    <span class="copied">✓ Скопировано!</span>
+  </div>
+
+  <p class="port-hint">📱 Порт для Bedrock (телефон): <b>19709</b></p>
+
+  <div class="hero-buttons">
+    <a href="#join" class="btn">Как подключиться</a>
+    <a href="https://discord.gg/CfSu8cgV" target="_blank" class="btn btn-outline">Discord сервер</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><h3>1.21+</h3><p>Версия Java</p></div>
+    <div class="stat"><h3>24/7</h3><p>Онлайн</p></div>
+    <div class="stat"><h3>PC+📱</h3><p>Кросс-платформа</p></div>
+    <div class="stat"><h3>0</h3><p>RTP и китов</p></div>
+  </div>
+</section>
+
+<!-- STATUS -->
+<section id="status">
+  <div class="section-title reveal">
+    <div class="section-eyebrow">Live Monitor</div>
+    <h2>Связь с <span class="accent">сервером</span></h2>
+    <p>Прямое подключение к игровому ядру в реальном времени</p>
+  </div>
+
+  <div class="pc-wrap reveal">
+    <div class="pc-tower" id="pcTower">
+      <div class="pc-glass">
+        <div class="pc-rgb"></div>
+        <div class="pc-mobo">
+          <div class="fan"><div class="fan-blades"></div></div>
+          <div class="fan"><div class="fan-blades"></div></div>
+          <div class="gpu">
+            <span class="gpu-led"></span>
+            <span class="gpu-led"></span>
+            <span class="gpu-led"></span>
+          </div>
+          <div class="ram"><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="pc-front">
+        <div class="pc-power" id="pcPower"></div>
+        <div class="pc-vent"></div>
+        <div class="pc-vent"></div>
+        <div class="pc-vent"></div>
+        <div class="pc-vent"></div>
+      </div>
+      <div class="pc-stand"></div>
+    </div>
+
+    <div class="monitor">
+      <div class="monitor-frame">
+        <div class="monitor-screen">
+          <div class="screen-header">
+            <span>💻 BEBRA-MAXIMUM :: CONSOLE</span>
+            <span class="screen-status" id="connStatus">● CONNECTING...</span>
+          </div>
+          <div class="screen-body">
+            <div class="metric">
+              <span class="metric-label">🌐 IP</span>
+              <span class="metric-value" id="statIP">bebra-maximum.ru</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">👥 Онлайн</span>
+              <span class="metric-value" id="statPlayers">— / —</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">📡 Пинг</span>
+              <span class="metric-value" id="statPing">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">🎮 Версия</span>
+              <span class="metric-value" id="statVersion">—</span>
+            </div>
+            <div class="metric metric-full">
+              <span class="metric-label">📝 MOTD</span>
+              <span class="metric-value" id="statMotd">Загрузка...</span>
+            </div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-label">
+              <span>Загрузка ядра</span>
+              <span id="loadPercent">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="loadBar"></div></div>
+          </div>
+          <div class="screen-log" id="screenLog">
+            <div>▸ Инициализация подключения...</div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-stand"></div>
+      <div class="monitor-base"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-title reveal">
+    <div class="section-eyebrow">О проекте</div>
+    <h2>О <span class="accent">сервере</span></h2>
+  </div>
+  <div class="about-card glass reveal">
+    <p>Мы создали <b>комфортную Minecraft-деревню</b> — место, где хочется строить, общаться и развиваться. Минимум плагинов, чтобы сохранить <b>ванильный стиль игры</b>, но при этом разнообразить рутинные задачи и добавить больше способов самовыражения.</p>
+    <p>Никаких RTP, китов и прочего — только <b>чистый геймплей</b>, который мы все любим.</p>
+    <div class="about-quote">«Ждём активных и творческих игроков на нашем сервере!»</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-title reveal">
+    <div class="section-eyebrow">Направления</div>
+    <h2>Чем можно <span class="accent">заняться</span></h2>
+    <p>Основные активности на Bebra Maximum</p>
+  </div>
+
+  <div class="features">
+    <div class="feature glass reveal"><div class="feature-icon">🏗️</div><h3>Строительство</h3><p>Создавай деревню своей мечты, строй общие проекты и воплощай самые смелые идеи вместе с другими игроками.</p></div>
+    <div class="feature glass reveal"><div class="feature-icon">🎉</div><h3>Ивенты</h3><p>Регулярные события: конкурсы, мини-игры, коллективные стройки и праздничные мероприятия.</p></div>
+    <div class="feature glass reveal"><div class="feature-icon">📜</div><h3>Квесты</h3><p>Интересные задания, за которые можно получить награды и прокачать своего персонажа.</p></div>
+    <div class="feature glass reveal"><div class="feature-icon">⚔️</div><h3>Прокачка навыков</h3><p>Развивай своего персонажа в разных направлениях и открывай новые возможности.</p></div>
+    <div class="feature glass reveal"><div class="feature-icon">🌿</div><h3>Ванильный стиль</h3><p>Минимум плагинов — максимум чистого Minecraft. Никаких RTP, китов и лишнего шума.</p></div>
+    <div class="feature glass reveal"><div class="feature-icon">📱</div><h3>Кросс-платформа</h3><p>Играй откуда угодно — с телефона (Bedrock) или с ПК (Java). Все вместе на одном сервере.</p></div>
+  </div>
+</section>
+
+<!-- JOIN -->
+<section id="join">
+  <div class="section-title reveal">
+    <div class="section-eyebrow">Быстрый старт</div>
+    <h2>Как <span class="accent">играть</span></h2>
+    <p>Подключение займёт меньше минуты</p>
+  </div>
+
+  <div class="steps">
+    <div class="step glass reveal"><div class="step-num">1</div><h3>Скачай Minecraft</h3><p>Java Edition для ПК или Bedrock Edition для телефона / консоли.</p></div>
+    <div class="step glass reveal"><div class="step-num">2</div><h3>Добавь сервер</h3><p>Открой «Сетевая игра» → «Добавить сервер» и впиши IP.</p></div>
+    <div class="step glass reveal"><div class="step-num">3</div><h3>Bedrock порт</h3><p>Укажи порт <b>19709</b> в настройках подключения.</p></div>
+    <div class="step glass reveal"><div class="step-num">4</div><h3>Заходи в игру!</h3><p>Добро пожаловать в нашу уютную деревню 🎮</p></div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="rules">
+  <div class="section-title reveal">
+    <div class="section-eyebrow">Порядок</div>
+    <h2>Правила <span class="accent">сервера</span></h2>
+    <p>Чтобы всем было комфортно играть</p>
+  </div>
+
+  <div class="rules">
+    <div class="rule glass reveal"><div class="rule-icon">🤝</div><div><h4>Уважай других</h4><p>Без оскорблений, травли и токсичности. Мы тут для хорошего времяпровождения.</p></div></div>
+    <div class="rule glass reveal"><div class="rule-icon">🚫</div><div><h4>Без гриферства</h4><p>Не ломай чужие постройки и не воруй из сундуков. Стройте вместе!</p></div></div>
+    <div class="rule glass reveal"><div class="rule-icon">💬</div><div><h4>Без спама и рекламы</h4><p>Не флуди в чате и не рекламируй сторонние проекты.</p></div></div>
+    <div class="rule glass reveal"><div class="rule-icon">🛡️</div><div><h4>Без читов</h4><p>X-Ray, килл-аура, флай и другие читы запрещены. Играем честно.</p></div></div>
+    <div class="rule glass reveal"><div class="rule-icon">🎭</div><div><h4>Без дюпов</h4><p>Использование багов для получения предметов запрещено.</p></div></div>
+    <div class="rule glass reveal"><div class="rule-icon">👑</div><div><h4>Слушайся админов</h4><p>Решения администрации окончательны и обсуждению не подлежат.</p></div></div>
+  </div>
+</section>
+
+<!-- SOCIALS -->
+<section id="socials">
+  <div class="section-title reveal">
+    <div class="section-eyebrow">Будь на связи</div>
+    <h2>Наши <span class="accent">соцсети</span></h2>
+    <p>Подписывайся, чтобы не пропустить ивенты</p>
+  </div>
+
+  <div class="socials-grid">
+    <a href="https://discord.gg/CfSu8cgV" target="_blank" class="social glass reveal"><span class="social-icon">💬</span><h3>Discord</h3><p>discord.gg/CfSu8cgV</p></a>
+    <a href="https://t.me/bebra_maximum" target="_blank" class="social glass reveal"><span class="social-icon">✈️</span><h3>Telegram</h3><p>@bebra_maximum</p></a>
+    <a href="https://tiktok.com/@bebra.maximum" target="_blank" class="social glass reveal"><span class="social-icon">🎵</span><h3>TikTok</h3><p>@bebra.maximum</p></a>
+    <a href="https://vk.com/bebra_maximum" target="_blank" class="social glass reveal"><span class="social-icon">🔵</span><h3>ВКонтакте</h3><p>vk.com/bebra_maximum</p></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-content">
+    <div>
+      <div class="footer-logo-wrap">
+        <!-- Баннер SVG в футере -->
+        <img src="logo-banner.svg" alt="BEBRA MAXIMUM" class="footer-logo-img" onerror="this.classList.add('hidden')">
+        <span class="footer-logo-text">BEBRA-MAXIMUM</span>
+      </div>
+      <p>Уютный кросс-платформенный Minecraft-сервер. Играй с телефона или ПК — где угодно и когда угодно!</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <a href="#about">О сервере</a>
+      <a href="#features">Особенности</a>
+      <a href="#status">Статус</a>
+      <a href="#join">Как играть</a>
+      <a href="#rules">Правила</a>
+    </div>
+    <div class="footer-col">
+      <h4>Мы в сети</h4>
+      <a href="https://discord.gg/CfSu8cgV" target="_blank">Discord</a>
+      <a href="https://t.me/bebra_maximum" target="_blank">Telegram</a>
+      <a href="https://tiktok.com/@bebra.maximum" target="_blank">TikTok</a>
+      <a href="https://vk.com/bebra_maximum" target="_blank">ВКонтакте</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 Bebra Maximum · Сделано с ❤️ для джигитеров</div>
+</footer>
+
+<script>
+const SERVER = {
+  ip: 'bebra-maximum.ru',
+  bedrockPort: 19709,
+  apiBase: 'https://api.mcstatus.io/v2/status/java/'
+};
+
+function copyIP(el){
+  const ip = document.getElementById('serverIP').innerText;
+  navigator.clipboard.writeText(ip).then(() => {
+    const tip = el.querySelector('.copied');
+    tip.classList.add('show');
+    logToConsole(`IP ${ip} скопирован`);
+    setTimeout(() => tip.classList.remove('show'), 1600);
+  });
+}
+
+function logToConsole(text){
+  const log = document.getElementById('screenLog');
+  if(!log) return;
+  const line = document.createElement('div');
+  const time = new Date().toLocaleTimeString('ru-RU', {hour12:false});
+  line.innerHTML = `[${time}] <span>▸</span> ${text}`;
+  log.prepend(line);
+  while(log.children.length > 6) log.removeChild(log.lastChild);
+}
+
+function setProgress(percent){
+  const bar = document.getElementById('loadBar');
+  const label = document.getElementById('loadPercent');
+  if(!bar || !label) return;
+  bar.style.width = percent + '%';
+  label.textContent = Math.round(percent) + '%';
+}
+
+async function fetchServerStatus(){
+  const tower = document.getElementById('pcTower');
+  const statusEl = document.getElementById('connStatus');
+  const playersEl = document.getElementById('statPlayers');
+  const pingEl = document.getElementById('statPing');
+  const versionEl = document.getElementById('statVersion');
+  const motdEl = document.getElementById('statMotd');
+  const ipEl = document.getElementById('statIP');
+
+  ipEl.textContent = SERVER.ip;
+  setProgress(20);
+
+  try{
+    const t1 = performance.now();
+    const res = await fetch(SERVER.apiBase + SERVER.ip, {cache:'no-store'});
+    const ping = Math.round(performance.now() - t1);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    setProgress(60);
+
+    if(data.online){
+      tower.classList.remove('offline');
+      statusEl.textContent = '● ONLINE';
+      statusEl.className = 'screen-status online';
+      const online = data.players?.online ?? 0;
+      const max = data.players?.max ?? '?';
+      playersEl.textContent = `${online} / ${max}`;
+      playersEl.className = 'metric-value online';
+      versionEl.textContent = data.version?.name_clean || data.version?.name || '—';
+      motdEl.textContent = data.motd?.clean || data.motd?.raw || 'Bebra Maximum';
+      pingEl.textContent = `~${ping} ms`;
+      pingEl.className = 'metric-value online';
+      setProgress(100);
+      logToConsole(`Сервер онлайн · ${online} игроков · ${ping}ms`);
+    } else {
+      throw new Error('Server offline');
+    }
+  } catch(err){
+    tower.classList.add('offline');
+    statusEl.textContent = '● OFFLINE';
+    statusEl.className = 'screen-status offline';
+    playersEl.textContent = '— / —';
+    playersEl.className = 'metric-value offline';
+    pingEl.textContent = '—';
+    pingEl.className = 'metric-value offline';
+    versionEl.textContent = '—';
+    motdEl.textContent = 'Сервер временно недоступен';
+    setProgress(0);
+    logToConsole('❌ Не удалось подключиться');
+  }
+}
+
+function initReveal(){
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('active');
+        observer.unobserve(e.target);
+      }
+    });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+function initHeaderScroll(){
+  const header = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  });
+}
+
+function initSmoothScroll(){
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if(id === '#' || id.length < 2) return;
+      const target = document.querySelector(id);
+      if(target){
+        e.preventDefault();
+        const y = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({top:y, behavior:'smooth'});
+      }
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initReveal();
+  initHeaderScroll();
+  initSmoothScroll();
+  fetchServerStatus();
+  setInterval(fetchServerStatus, 30000);
+  logToConsole('Система Bebra Maximum готова');
+});
+</script>
+
+</body>
+  </html>
