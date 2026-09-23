@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEBRA MAXIMUM — Minecraft сервер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+<!-- HEADER -->
+<header id="header">
+  <div class="logo">BEBRA-MAXIMUM</div>
+  <nav>
+    <a href="#about">О сервере</a>
+    <a href="#features">Особенности</a>
+    <a href="#status">Статус</a>
+    <a href="#join">Как играть</a>
+    <a href="#rules">Правила</a>
+    <a href="#socials">Контакты</a>
+  </nav>
+  <a href="#join" class="btn">Играть</a>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="float-block" style="top:15%;left:8%;animation-delay:0s"></div>
+  <div class="float-block" style="top:70%;left:88%;animation-delay:2s"></div>
+  <div class="float-block" style="top:22%;right:12%;animation-delay:4s"></div>
+  <div class="float-block" style="bottom:18%;left:16%;animation-delay:1s"></div>
+  <div class="float-block" style="top:45%;right:6%;animation-delay:3s"></div>
+
+  <div class="badge">
+    <span class="dot"></span>
+    Сервер онлайн · Кросс-платформа
+  </div>
+
+  <h1>BEBRA-MAXIMUM</h1>
+
+  <p class="subtitle">
+    ❤️ Салам, джигитер! <b>Самый лучший кросс-платформенный сервер</b> — играй как с телефона, так и с ПК.
+    Уютная майнкрафт-деревня, ивенты, квесты и прокачка навыков.
+  </p>
+
+  <div class="ip-box" onclick="copyIP(this)">
+    <span class="ip-icon">🎮</span>
+    <div class="ip-text">
+      <div class="ip-label">IP сервера</div>
+      <div class="ip-value" id="serverIP">bebra-maximum.ru</div>
+    </div>
+    <span class="copied">Скопировано!</span>
+  </div>
+
+  <p class="port-hint">📱 Порт для Bedrock (телефон): <b>19709</b></p>
+
+  <div class="hero-buttons">
+    <a href="#join" class="btn">Как подключиться</a>
+    <a href="https://discord.gg/CfSu8cgV" target="_blank" class="btn btn-outline">Discord сервер</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><h3>1.21+</h3><p>ВЕРСИЯ JAVA</p></div>
+    <div class="stat"><h3>24/7</h3><p>ОНЛАЙН</p></div>
+    <div class="stat"><h3>PC + 📱</h3><p>КРОСС-ПЛАТФОРМА</p></div>
+    <div class="stat"><h3>0</h3><p>RTP И КИТОВ</p></div>
+  </div>
+</section>
+
+<!-- SERVER STATUS / PC -->
+<section class="status-section" id="status">
+  <div class="section-title reveal">
+    <h2>СВЯЗЬ С <span>СЕРВЕРОМ</span></h2>
+    <p>Прямое подключение к игровому ядру в реальном времени</p>
+  </div>
+
+  <div class="pc-wrap reveal">
+
+    <!-- PC TOWER -->
+    <div class="pc-tower" id="pcTower">
+      <div class="pc-glass">
+        <div class="pc-rgb"></div>
+        <div class="pc-mobo">
+          <div class="fan fan-1"><div class="fan-blades"></div></div>
+          <div class="fan fan-2"><div class="fan-blades"></div></div>
+          <div class="gpu">
+            <span class="gpu-led"></span>
+            <span class="gpu-led"></span>
+            <span class="gpu-led"></span>
+          </div>
+          <div class="ram">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+      <div class="pc-front">
+        <div class="pc-power" id="pcPower"></div>
+        <div class="pc-vent"></div>
+        <div class="pc-vent"></div>
+        <div class="pc-vent"></div>
+        <div class="pc-vent"></div>
+      </div>
+      <div class="pc-stand"></div>
+    </div>
+
+    <!-- MONITOR -->
+    <div class="monitor">
+      <div class="monitor-frame">
+        <div class="monitor-screen">
+          <div class="screen-header">
+            <span class="screen-title">💻 BEBRA-MAXIMUM :: SERVER CONSOLE</span>
+            <span class="screen-status" id="connStatus">● CONNECTING...</span>
+          </div>
+
+          <div class="screen-body">
+            <div class="metric">
+              <span class="metric-label">🌐 IP</span>
+              <span class="metric-value" id="statIP">bebra-maximum.ru</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">👥 Онлайн</span>
+              <span class="metric-value" id="statPlayers">— / —</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">📡 Пинг</span>
+              <span class="metric-value" id="statPing">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">🎮 Версия</span>
+              <span class="metric-value" id="statVersion">—</span>
+            </div>
+            <div class="metric metric-full">
+              <span class="metric-label">📝 MOTD</span>
+              <span class="metric-value" id="statMotd">Загрузка...</span>
+            </div>
+
+            <div class="progress-bar-wrap">
+              <div class="progress-label">
+                <span>Загрузка ядра</span>
+                <span id="loadPercent">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="loadBar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen-log" id="screenLog">
+            <div>▸ Инициализация подключения...</div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-stand"></div>
+      <div class="monitor-base"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-bg" id="about">
+  <div class="about-wrap reveal">
+    <div class="section-title">
+      <h2>О <span>СЕРВЕРЕ</span></h2>
+    </div>
+    <p>Мы создали <b>комфортную Minecraft-деревню</b> — место, где хочется строить, общаться и развиваться. Минимум плагинов, чтобы сохранить <b>ванильный стиль игры</b>, но при этом разнообразить рутинные задачи и добавить больше способов самовыражения.</p>
+    <p>Никаких RTP, китов и прочего — только <b>чистый геймплей</b>, который мы все любим.</p>
+    <div class="about-quote">«Ждём активных и творческих игроков<br>на нашем сервере!»</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-title reveal">
+    <h2>ОСНОВНЫЕ <span>НАПРАВЛЕНИЯ</span></h2>
+    <p>Чем можно заняться на Bebra Maximum</p>
+  </div>
+
+  <div class="features">
+    <div class="feature reveal"><div class="feature-icon">🏗️</div><h3>Строительство</h3><p>Создавай деревню своей мечты, строй общие проекты и воплощай самые смелые идеи вместе с другими игроками.</p></div>
+    <div class="feature reveal"><div class="feature-icon">🎉</div><h3>Ивенты</h3><p>Регулярные события: конкурсы, мини-игры, коллективные стройки и праздничные мероприятия.</p></div>
+    <div class="feature reveal"><div class="feature-icon">📜</div><h3>Квесты</h3><p>Интересные задания, за которые можно получить награды и прокачать своего персонажа.</p></div>
+    <div class="feature reveal"><div class="feature-icon">⚔️</div><h3>Прокачка навыков</h3><p>Развивай своего персонажа в разных направлениях и открывай новые возможности.</p></div>
+    <div class="feature reveal"><div class="feature-icon">🌿</div><h3>Ванильный стиль</h3><p>Минимум плагинов — максимум чистого Minecraft. Никаких RTP, китов и лишнего шума.</p></div>
+    <div class="feature reveal"><div class="feature-icon">📱</div><h3>Кросс-платформа</h3><p>Играй откуда угодно — с телефона (Bedrock) или с ПК (Java). Все вместе на одном сервере.</p></div>
+  </div>
+</section>
+
+<!-- HOW TO JOIN -->
+<section id="join" style="background:var(--bg2)">
+  <div class="section-title reveal">
+    <h2>КАК <span>ИГРАТЬ</span></h2>
+    <p>Подключение займёт меньше минуты</p>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal"><div class="step-num">1</div><h3>Скачай Minecraft</h3><p>Java Edition для ПК или Bedrock Edition для телефона / консоли.</p></div>
+    <div class="step reveal"><div class="step-num">2</div><h3>Добавь сервер</h3><p>Открой «Сетевая игра» → «Добавить сервер» и впиши IP.</p></div>
+    <div class="step reveal"><div class="step-num">3</div><h3>Для Bedrock порт</h3><p>Укажи порт <b style="color:var(--yellow)">19709</b> в настройках подключения.</p></div>
+    <div class="step reveal"><div class="step-num">4</div><h3>Заходи в игру!</h3><p>Добро пожаловать в нашу уютную деревню 🎮</p></div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="rules">
+  <div class="section-title reveal">
+    <h2>ПРАВИЛА <span>СЕРВЕРА</span></h2>
+    <p>Чтобы всем было комфортно играть</p>
+  </div>
+
+  <div class="rules">
+    <div class="rule reveal"><div class="rule-icon">🤝</div><div><h4>Уважай других</h4><p>Без оскорблений, травли и токсичности. Мы тут для хорошего времяпровождения.</p></div></div>
+    <div class="rule reveal"><div class="rule-icon">🚫</div><div><h4>Без гриферства</h4><p>Не ломай чужие постройки и не воруй из сундуков. Стройте вместе!</p></div></div>
+    <div class="rule reveal"><div class="rule-icon">💬</div><div><h4>Без спама и рекламы</h4><p>Не флуди в чате и не рекламируй сторонние проекты.</p></div></div>
+    <div class="rule reveal"><div class="rule-icon">🛡️</div><div><h4>Без читов</h4><p>X-Ray, килл-аура, флай и другие читы запрещены. Играем честно.</p></div></div>
+    <div class="rule reveal"><div class="rule-icon">🎭</div><div><h4>Без дюпов</h4><p>Использование багов для получения предметов запрещено.</p></div></div>
+    <div class="rule reveal"><div class="rule-icon">👑</div><div><h4>Слушайся админов</h4><p>Решения администрации окончательны и обсуждению не подлежат.</p></div></div>
+  </div>
+</section>
+
+<!-- SOCIALS -->
+<section class="socials-bg" id="socials">
+  <div class="section-title reveal">
+    <h2>НАШИ <span>СОЦСЕТИ</span></h2>
+    <p>Подписывайся, чтобы не пропустить ивенты</p>
+  </div>
+
+  <div class="socials-grid">
+    <a href="https://discord.gg/CfSu8cgV" target="_blank" class="social reveal"><span class="social-icon">💬</span><h3>Discord</h3><p>discord.gg/CfSu8cgV</p></a>
+    <a href="https://t.me/bebra_maximum" target="_blank" class="social reveal"><span class="social-icon">✈️</span><h3>Telegram</h3><p>@bebra_maximum</p></a>
+    <a href="https://tiktok.com/@bebra.maximum" target="_blank" class="social reveal"><span class="social-icon">🎵</span><h3>TikTok</h3><p>@bebra.maximum</p></a>
+    <a href="https://vk.com/bebra_maximum" target="_blank" class="social reveal"><span class="social-icon">🔵</span><h3>ВКонтакте</h3><p>vk.com/bebra_maximum</p></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-content">
+    <div>
+      <div class="footer-logo">BEBRA-MAXIMUM</div>
+      <p>Уютный кросс-платформенный Minecraft-сервер. Играй с телефона или ПК — где угодно и когда угодно!</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <a href="#about">О сервере</a>
+      <a href="#features">Особенности</a>
+      <a href="#status">Статус</a>
+      <a href="#join">Как играть</a>
+      <a href="#rules">Правила</a>
+    </div>
+    <div class="footer-col">
+      <h4>Мы в сети</h4>
+      <a href="https://discord.gg/CfSu8cgV" target="_blank">Discord</a>
+      <a href="https://t.me/bebra_maximum" target="_blank">Telegram</a>
+      <a href="https://tiktok.com/@bebra.maximum" target="_blank">TikTok</a>
+      <a href="https://vk.com/bebra_maximum" target="_blank">ВКонтакте</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 Bebra Maximum · Сделано с ❤️ для джигитеров</div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+  </html>
