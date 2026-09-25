@@ -2045,14 +2045,30 @@ code {
   /* Рекорд считает сам мониторинг: он сравнивает онлайн на каждом опросе,
      в том числе когда на страницу никто не смотрит. Страница только
      показывает насчитанное и никогда не уменьшает число — иначе при обрыве
-     связи с бэкендом рекорд «просел» бы. */
-  var bestPeak = parseInt($('#recNum').textContent, 10) || 0;
+     связи с бэкендом рекорд «просел» бы.
+
+     Вдобавок страница держит копию рекорда у себя в браузере. Бэкенд живёт
+     в песочнице и перезапускается, а рекорд у него лежит в файле внутри
+     приложения. Если файл перезапуск не переживёт, число откатится к
+     стартовому — и вернувшийся посетитель всё равно увидит настоящий
+     максимум, а не заниженный. */
+  var PEAK_KEY = 'bebra-peak';
+  var baked = parseInt($('#recNum').textContent, 10) || 0;
+
+  function readSaved() {
+    try { return parseInt(localStorage.getItem(PEAK_KEY), 10) || 0; }
+    catch (e) { return 0; }   /* приватный режим — просто нет копии */
+  }
+
+  var bestPeak = Math.max(baked, readSaved());
+  if (bestPeak > baked) el.rec.textContent = num(bestPeak);
 
   function showPeak(peak) {
     var v = peak && peak.total;
     if (typeof v !== 'number' || !isFinite(v) || v <= bestPeak) return;
     bestPeak = v;
     el.rec.textContent = num(v);
+    try { localStorage.setItem(PEAK_KEY, String(v)); } catch (e) { }
   }
 
   function num(n) {
