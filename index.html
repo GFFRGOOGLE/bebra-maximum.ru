@@ -750,6 +750,20 @@ button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit
   .section{padding:84px 0}
 }
 
+/* ============ НИЗКИЕ ЭКРАНЫ (ноутбуки, ~950px и меньше) ============
+   Полный блок hero (бейдж → логотип → текст → IP → кнопки) должен
+   помещаться в первый экран, иначе кнопки уезжают под сгиб. */
+
+@media (min-width:769px) and (max-height:980px){
+  .hero{padding:104px 24px 56px}
+  .badge{margin-bottom:26px}
+  .logo-float{margin-bottom:28px}
+  .logo-ring{width:min(290px,31vh)}
+  .hero-title{margin-bottom:16px}
+  .hero-sub{margin-bottom:26px}
+  .ip-wrap{margin-bottom:26px}
+}
+
 /* ============ МОБИЛЬНЫЕ ============ */
 
 @media (max-width:768px){
