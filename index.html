@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEBRA-MAXIMUM — Minecraft сервер Java и Bedrock</title>
-<meta name="description" content="BEBRA-MAXIMUM — кросс-платформенный Minecraft сервер. Java и Bedrock в одном мире: медные данжи, особые ключи, ивенты и квесты. Без доната и китов.">
+<meta name="description" content="BEBRA-MAXIMUM — кросс-платформенный Minecraft сервер. Java и Bedrock в одном мире: медные данжи и особые ключи. Без доната и китов.">
 <meta name="theme-color" content="#f2f4f9">
 <link rel="icon" href="logo-square.jpg">
 <meta property="og:type" content="website">
@@ -375,13 +375,6 @@ html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
 }
 .ipbar button:hover { background: var(--blue-dark); }
 
-.hint {
-  font-size: 13.5px;
-  color: var(--muted);
-  margin: 0 0 20px;
-}
-.hint b { color: var(--text); font-weight: 700; }
-
 .cta {
   display: flex;
   flex-wrap: wrap;
@@ -585,16 +578,6 @@ html[data-theme="dark"] .island .shadow {
 
 .sec-head { margin-bottom: 36px; }
 
-.eyebrow {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2.2px;
-  text-transform: uppercase;
-  color: var(--blue);
-  margin-bottom: 12px;
-}
-
 .sec-head h2 {
   font-family: var(--font-title);
   font-size: clamp(24px, 4.4vw, 34px);
@@ -773,25 +756,6 @@ html[data-theme="dark"] .island .shadow {
   transition: width .5s cubic-bezier(.22, .7, .3, 1);
 }
 
-.chart {
-  margin-top: 16px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 20px 22px 12px;
-}
-
-.chart-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-.chart-head h3 { font-size: 15.5px; }
-.chart-head span { margin-left: auto; font-size: 13px; color: var(--muted); }
-
-.chart svg { width: 100%; height: 100px; display: block; overflow: visible; }
-
 /* ================= галерея ================= */
 
 .gal {
@@ -872,10 +836,20 @@ html[data-theme="dark"] .island .shadow {
 
 /* ================= карточки-фичи ================= */
 
+/* Карточек пять, а в ряд влезает три: во второй строке оставались две
+   прижатые к левому краю, и рядом зияла дырка на целую карточку.
+   Флексом последний ряд центрируется — читается как задумано, а не как
+   «не хватило шестой карточки». */
 .feat {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+}
+
+.feat > .f {
+  flex: 0 1 300px;
+  min-width: 0;
 }
 
 .f {
@@ -1138,7 +1112,6 @@ code {
   .hero { padding: 38px 0 0; }
   .hero h1 { font-size: clamp(34px, 5.6vw, 60px); }
   .lead { margin-bottom: 22px; }
-  .hint { margin-bottom: 20px; }
 }
 
 /* Кому анимации мешают — отключаем всё лишнее.
@@ -1205,9 +1178,8 @@ code {
     <h1><span class="b">BEBRA</span>-<span class="y">MAXIMUM</span></h1>
 
     <p class="lead">
-      Кросс-платформенный Minecraft-сервер. Java и Bedrock живут в одном мире,
-      плагинов минимум — ваниль, к которой добавлено ровно то, ради чего
-      хочется возвращаться.
+      Кросс-платформенный Minecraft-сервер. Java и Bedrock живут в одном мире:
+      ваниль без привата, стартовых наборов и доната.
     </p>
 
     <div class="ipbar">
@@ -1217,10 +1189,6 @@ code {
       </div>
       <button type="button" id="copy">Скопировать</button>
     </div>
-
-    <p class="hint">
-      Java — <b>bebra-maximum.ru</b>, порт <b>19048</b> · Bedrock — тот же адрес, порт <b>19709</b>
-    </p>
 
     <div class="cta">
       <a class="btn btn-blue" href="#connect">
@@ -1247,9 +1215,7 @@ code {
 <section class="sec" id="live">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Прямо сейчас</span>
       <h2>Сколько людей в игре</h2>
-      <p>Данные не с чужого сайта-мониторинга: страница сама стучится на игровой сервер по TCP и UDP и показывает то, что он ответил.</p>
     </div>
 
     <div class="live-top rv">
@@ -1290,24 +1256,6 @@ code {
         <div class="bar"><i id="bBar"></i></div>
       </div>
     </div>
-
-    <div class="chart rv">
-      <div class="chart-head">
-        <h3>Онлайн за последние минуты</h3>
-        <span id="chartNote">ждём данные…</span>
-      </div>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="График онлайна">
-        <defs>
-          <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#29ABE2" stop-opacity=".38"/>
-            <stop offset="100%" stop-color="#29ABE2" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <path id="sparkArea" fill="url(#fillGrad)" d=""></path>
-        <path id="sparkLine" fill="none" stroke="#29ABE2" stroke-width="2.5"
-              stroke-linejoin="round" stroke-linecap="round" d=""></path>
-      </svg>
-    </div>
   </div>
 </section>
 
@@ -1317,7 +1265,6 @@ code {
 <section class="sec" id="gallery">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Как это выглядит</span>
       <h2>Фотографии с сервера</h2>
       <p>Скриншоты игроков. Нажмите на любую, чтобы открыть во весь экран.</p>
     </div>
@@ -1351,7 +1298,6 @@ code {
 <section class="sec" id="about">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Что это за место</span>
       <h2>О сервере</h2>
     </div>
 
@@ -1364,14 +1310,13 @@ code {
           считается нормальным.
         </p>
         <p>
-          Плагинов минимум, чтобы не ломать ванильный стиль: они добавлены только там,
-          где разнообразят рутину и дают больше способов самовыражения. Основные
-          направления — строительство, ивенты, квесты и прокачка навыков.
+          Плагинов минимум, чтобы не ломать ванильный стиль. Из своего —
+          медные данжи и особые ключи к ним.
         </p>
         <p>
           Главное отличие — <b>Java и Bedrock играют вместе</b>. Можно сидеть за компьютером,
-          а друг рядом — с телефона, и вы будете в одном мире. Серверу год: годовщина
-          6 сентября, к ней как раз обновили медные данжи и добавили особые ключи.
+          а друг рядом — с телефона, и вы будете в одном мире. Серверу год, годовщина
+          6 сентября.
         </p>
       </div>
     </div>
@@ -1382,9 +1327,7 @@ code {
 <section class="sec" id="features">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Чем заняться</span>
       <h2>Что внутри</h2>
-      <p>Коротко о том, ради чего тут собираются.</p>
     </div>
 
     <div class="feat">
@@ -1439,7 +1382,7 @@ code {
           </svg>
         </div>
         <h3>Java + Bedrock</h3>
-        <p>Один мир на все платформы: компьютер, телефон, планшет. Пиратская версия тоже пускается.</p>
+        <p>Один мир на все платформы: компьютер, телефон, планшет.</p>
       </div>
 
       <div class="f rv">
@@ -1453,19 +1396,6 @@ code {
         <h3>Без доната и китов</h3>
         <p>Нет ни магазина за реальные деньги, ни стартовых наборов, ни привата. Всё, что есть, добыто руками.</p>
       </div>
-
-      <div class="f rv">
-        <div class="ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3.6 18.4l4.8-5.1 3.4 3.1 7.2-7.4"/>
-            <path d="M15 8.6h5.4v5.4"/>
-            <path d="M3.6 21.4h16.8"/>
-          </svg>
-        </div>
-        <h3>Квесты и прокачка</h3>
-        <p>Ивенты и задания с наградами, плюс навыки, которые качаются сами по ходу игры.</p>
-      </div>
     </div>
   </div>
 </section>
@@ -1474,7 +1404,6 @@ code {
 <section class="sec" id="connect">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Подключение</span>
       <h2>Как зайти</h2>
       <p>Три шага, дальше всё как обычно.</p>
     </div>
@@ -1482,7 +1411,7 @@ code {
     <div class="steps">
       <div class="st rv">
         <h3>Запустите нужную версию</h3>
-        <p>Java — любой релиз от 1.7.2 до 1.21.11. Bedrock — обычный Minecraft с телефона, планшета или Windows.</p>
+        <p>Java — обычный Minecraft с компьютера. Bedrock — с телефона, планшета или Windows.</p>
       </div>
       <div class="st rv">
         <h3>Добавьте сервер</h3>
@@ -1513,7 +1442,6 @@ code {
 <section class="sec" id="socials">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow">Связь</span>
       <h2>Где мы общаемся</h2>
       <p>Анонсы обновлений, скриншоты и поиск напарников — всё там.</p>
     </div>
@@ -2207,7 +2135,6 @@ code {
     heroState: $('#heroState'),
     jBadge: $('#jBadge'), jPlayers: $('#jPlayers'), jVer: $('#jVer'), jPing: $('#jPing'), jBar: $('#jBar'),
     bBadge: $('#bBadge'), bPlayers: $('#bPlayers'), bVer: $('#bVer'), bPing: $('#bPing'), bBar: $('#bBar'),
-    sparkLine: $('#sparkLine'), sparkArea: $('#sparkArea'), chartNote: $('#chartNote'),
     rec: $('#recNum')
   };
 
@@ -2268,29 +2195,6 @@ code {
     bar.style.width = Math.max(2, Math.min(100, (online / max) * 100)).toFixed(1) + '%';
   }
 
-  function drawSpark(hist) {
-    if (!hist || hist.length < 2) {
-      el.chartNote.textContent = 'мало данных, накопим';
-      return;
-    }
-    var W = 600, H = 100, padTop = 8, padBot = 8;
-    var vals = hist.map(function (p) { return p.total || 0; });
-    var max = Math.max(Math.max.apply(null, vals), 4); // чтобы линия не прыгала на нуле
-
-    var step = W / (vals.length - 1);
-    var d = '';
-
-    vals.forEach(function (v, i) {
-      var x = i * step;
-      var y = H - padBot - (v / max) * (H - padTop - padBot);
-      d += (i ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
-    });
-
-    el.sparkLine.setAttribute('d', d);
-    el.sparkArea.setAttribute('d', d + ' L' + W + ' ' + H + ' L0 ' + H + ' Z');
-    el.chartNote.textContent = 'пик ' + max + ', точек ' + vals.length;
-  }
-
   function render(d) {
     if (!d || !d.ok) return;
 
@@ -2324,11 +2228,13 @@ code {
     el.bPing.textContent = b.latency ? b.latency + ' мс' : '—';
     fillBar(el.bBar, bp, bm);
 
-    drawSpark(d.history);
     showPeak(d.peak);
 
-    el.stamp.textContent = 'обновлено в ' + timeOf(d.updatedAt || d.now)
-      + ' · опросов ' + (d.polls || 0);
+    /* Время последнего обновления и в тексте, и в атрибуте: по тексту его
+       неудобно сравнивать — минута меняется раз в шестьдесят секунд. */
+    var at = d.updatedAt || d.now;
+    el.stamp.textContent = 'обновлено в ' + timeOf(at);
+    el.stamp.setAttribute('data-updated', String(at || ''));
   }
 
   /* ---------------- соединение ---------------- */
