@@ -3,12 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BEBRA MAXIMUM — Minecraft сервер</title>
+<title>BEBRA-MAXIMUM — Minecraft сервер</title>
+<meta name="description" content="BEBRA-MAXIMUM — кросс-платформенный Minecraft сервер. Уютная майнкрафт-деревня, ивенты, квесты и прокачка навыков. Играй с телефона и с ПК.">
+<meta name="theme-color" content="#080b14">
+<link rel="icon" type="image/jpeg" href="logo-square.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+/* Фолбэк логотипов: если картинка не загрузилась — показываем стилизованный текст */
+function logoFallback(img){
+  var span = document.createElement('span');
+  span.className = 'logo-fallback' + (img.dataset.fallbackSize ? ' ' + img.dataset.fallbackSize : '');
+  span.textContent = 'BEBRA-MAXIMUM';
+  img.parentNode.replaceChild(span, img);
+}
+</script>
 <style>
 :root{
   --blue:#29ABE2;
   --blue-light:#5cc4f0;
+  --blue-deep:#1b7fb0;
   --yellow:#FFE500;
   --yellow-glow:#FFD400;
   --bg:#080b14;
@@ -16,1209 +31,1433 @@
   --card:rgba(255,255,255,0.04);
   --card-hover:rgba(255,255,255,0.07);
   --border:rgba(255,255,255,0.08);
-  --border-glow:rgba(41,171,226,0.4);
+  --border-strong:rgba(255,255,255,0.14);
+  --border-glow:rgba(41,171,226,0.45);
   --text:#ffffff;
   --muted:#8892a6;
   --green:#4ade80;
   --red:#ff5252;
+  --radius:20px;
+  --maxw:1280px;
 }
+
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+}
+
 body{
-  font-family:'Inter',sans-serif;
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
 body::before{
-  content:'';position:fixed;inset:0;z-index:-2;
+  content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(41,171,226,0.18), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 100%, rgba(255,229,0,0.1), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(41,171,226,0.20), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 100%, rgba(255,229,0,0.10), transparent 55%),
     radial-gradient(ellipse 60% 80% at 50% 50%, rgba(41,171,226,0.05), transparent 60%);
 }
+
 body::after{
   content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size:60px 60px;
-  mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
-  -webkit-mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 30%, #000 20%, transparent 85%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%, #000 20%, transparent 85%);
 }
 
-/* HEADER */
-header{
-  position:fixed;top:0;left:0;right:0;
-  padding:14px 40px;
-  display:flex;justify-content:space-between;align-items:center;
-  background:rgba(8,11,20,0.65);
-  backdrop-filter:blur(20px) saturate(150%);
-  -webkit-backdrop-filter:blur(20px) saturate(150%);
-  z-index:100;
-  border-bottom:1px solid var(--border);
-  transition:.3s;
-}
-header.scrolled{padding:8px 40px;background:rgba(8,11,20,0.88);box-shadow:0 8px 40px rgba(0,0,0,.5)}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit}
 
-.logo-wrap{
-  display:flex;align-items:center;gap:14px;cursor:pointer;
-  transition:.3s;
+.container{
+  width:100%;
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:0 24px;
 }
-.logo-wrap:hover{transform:scale(1.03)}
-.logo-banner{
-  height:48px;width:auto;display:block;
-  filter:drop-shadow(0 4px 20px rgba(255,229,0,.35)) drop-shadow(0 0 15px rgba(41,171,226,.3));
-  transition:.3s;
-  border-radius:6px;
-}
-.logo-wrap:hover .logo-banner{filter:drop-shadow(0 6px 30px rgba(255,229,0,.55)) drop-shadow(0 0 20px rgba(41,171,226,.5))}
+
+/* ============ ЛОГОТИПЫ ============ */
+
 .logo-fallback{
-  display:none;font-family:'Bungee',cursive;font-size:18px;
+  font-family:'Bungee',cursive;
   color:var(--yellow);
-  text-shadow:
-    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
-    0 0 25px rgba(255,229,0,.5);
-  letter-spacing:1px;
+  letter-spacing:0.02em;
+  line-height:1;
+  white-space:nowrap;
+  -webkit-text-stroke:2.5px #000;
+  paint-order:stroke fill;
+  text-shadow:0 4px 0 rgba(0,0,0,0.55);
 }
-.logo-banner.hidden + .logo-fallback{display:block}
+.logo-fallback.lg{font-size:clamp(22px,6vw,44px);-webkit-text-stroke:3px #000}
+.logo-fallback.sm{font-size:15px;-webkit-text-stroke:2px #000}
 
-nav{display:flex;gap:30px;align-items:center}
-nav a{
-  color:var(--muted);text-decoration:none;font-weight:600;
-  font-size:14px;transition:.25s;position:relative;padding:4px 0;
+/* ============ ШАПКА ============ */
+
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px 0;
+  transition:padding .35s ease, background .35s ease, box-shadow .35s ease, backdrop-filter .35s ease, border-color .35s ease;
+  border-bottom:1px solid transparent;
 }
-nav a:hover{color:var(--text)}
-nav a::after{
-  content:'';position:absolute;bottom:0;left:0;
-  width:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),var(--yellow));
-  transition:.3s;border-radius:2px;
+.header.scrolled{
+  padding:8px 0;
+  background:rgba(8,11,20,0.82);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-bottom-color:var(--border);
+  box-shadow:0 10px 34px rgba(0,0,0,0.45);
 }
-nav a:hover::after{width:100%}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;gap:22px;
+}
+.header-logo{display:flex;align-items:center;flex-shrink:0}
+.header-logo img{
+  height:48px;width:auto;border-radius:9px;
+  transition:height .35s ease;
+  box-shadow:0 6px 18px rgba(41,171,226,0.28);
+}
+.header.scrolled .header-logo img{height:38px}
+
+.nav{display:flex;align-items:center;gap:6px}
+.nav a{
+  position:relative;
+  padding:9px 15px;
+  border-radius:11px;
+  font-size:14.5px;font-weight:600;
+  color:rgba(255,255,255,0.72);
+  transition:color .25s ease, background .25s ease;
+  white-space:nowrap;
+}
+.nav a::after{
+  content:'';position:absolute;left:15px;right:15px;bottom:4px;height:2px;
+  border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--yellow));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s ease;
+}
+.nav a:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.nav a:hover::after{transform:scaleX(1)}
+
+/* ============ КНОПКИ ============ */
 
 .btn{
-  background:linear-gradient(135deg,var(--yellow),var(--yellow-glow));
-  color:#080b14;
-  padding:11px 24px;border-radius:10px;
-  font-weight:800;border:none;cursor:pointer;
-  transition:.25s;text-decoration:none;display:inline-block;
-  font-size:14px;letter-spacing:.3px;
-  box-shadow:0 4px 20px rgba(255,229,0,.3), inset 0 1px 0 rgba(255,255,255,.5);
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:14px 30px;
+  border-radius:14px;
+  font-size:15px;font-weight:700;letter-spacing:0.01em;
+  overflow:hidden;
+  transition:transform .28s cubic-bezier(.2,.7,.3,1), box-shadow .28s ease, background .28s ease, color .28s ease, border-color .28s ease;
+  white-space:nowrap;
+  text-align:center;
 }
-.btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 30px rgba(255,229,0,.5), inset 0 1px 0 rgba(255,255,255,.5);
+.btn:active{transform:translateY(-1px) scale(.99)}
+
+.btn-primary{
+  background:linear-gradient(160deg,#FFF45C 0%,var(--yellow) 45%,var(--yellow-glow) 100%);
+  color:#0a0d14;
+  box-shadow:0 6px 20px rgba(255,229,0,0.22), inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -2px 0 rgba(0,0,0,0.14);
 }
-.btn-outline{
-  background:transparent;color:var(--yellow);
-  border:2px solid rgba(255,229,0,.5);
-  box-shadow:none;
+.btn-primary::before{
+  content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,0.65),transparent);
+  transform:skewX(-18deg);
+  transition:left .65s ease;
 }
-.btn-outline:hover{
-  background:rgba(255,229,0,.1);
-  border-color:var(--yellow);
-  box-shadow:0 8px 30px rgba(255,229,0,.15);
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 14px 34px rgba(255,229,0,0.42), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -2px 0 rgba(0,0,0,0.14);
+}
+.btn-primary:hover::before{left:130%}
+
+.btn-discord{
+  background:rgba(255,229,0,0.05);
+  border:2px solid var(--yellow);
+  color:var(--yellow);
+  box-shadow:inset 0 0 0 0 rgba(255,229,0,0);
+}
+.btn-discord:hover{
+  transform:translateY(-3px);
+  background:rgba(255,229,0,0.13);
+  color:#fff;
+  border-color:#fff;
+  box-shadow:0 14px 32px rgba(255,229,0,0.24);
 }
 
-/* HERO */
+.btn-sm{padding:11px 22px;font-size:14px;border-radius:12px}
+
+/* ============ HERO ============ */
+
 .hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
-  text-align:center;
-  padding:140px 20px 80px;
   position:relative;
+  min-height:100vh;
+  min-height:100svh;
+  display:flex;align-items:center;justify-content:center;
+  padding:132px 24px 92px;
   overflow:hidden;
 }
-
-.particle{
-  position:absolute;
-  width:4px;height:4px;
-  background:var(--yellow);
-  border-radius:50%;
-  box-shadow:0 0 12px var(--yellow);
-  opacity:0;pointer-events:none;
-  animation:rise 8s ease-in infinite;
-}
-@keyframes rise{
-  0%{opacity:0;transform:translateY(0) scale(0)}
-  10%{opacity:.9}
-  90%{opacity:.9}
-  100%{opacity:0;transform:translateY(-100vh) scale(1.5)}
+.hero-inner{
+  position:relative;z-index:3;
+  width:100%;max-width:900px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
 }
 
 .badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(41,171,226,0.08);
-  border:1px solid rgba(41,171,226,.3);
-  color:var(--blue-light);
-  padding:8px 20px;border-radius:100px;
-  font-size:13px;font-weight:700;
-  margin-bottom:32px;
-  backdrop-filter:blur(10px);
-  letter-spacing:.5px;
-  text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:10px;
+  padding:9px 20px 9px 16px;
+  border-radius:100px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border-strong);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  font-size:13.5px;font-weight:600;letter-spacing:0.02em;
+  color:rgba(255,255,255,0.86);
+  margin-bottom:34px;
 }
-.dot{
-  width:8px;height:8px;border-radius:50%;
+.badge .dot{
+  width:9px;height:9px;border-radius:50%;
   background:var(--green);
-  box-shadow:0 0 12px var(--green), 0 0 0 0 rgba(74,222,128,.6);
+  box-shadow:0 0 0 0 rgba(74,222,128,0.6);
   animation:pulse 2s infinite;
+  flex-shrink:0;
 }
+.badge.is-off .dot{background:var(--red);box-shadow:0 0 0 0 rgba(255,82,82,0.6);animation-name:pulseRed}
+.badge.is-unknown .dot{background:var(--muted);animation:none}
 @keyframes pulse{
-  0%{box-shadow:0 0 12px var(--green), 0 0 0 0 rgba(74,222,128,.6)}
-  70%{box-shadow:0 0 12px var(--green), 0 0 0 10px rgba(74,222,128,0)}
-  100%{box-shadow:0 0 12px var(--green), 0 0 0 0 rgba(74,222,128,0)}
+  0%{box-shadow:0 0 0 0 rgba(74,222,128,0.6)}
+  70%{box-shadow:0 0 0 11px rgba(74,222,128,0)}
+  100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}
+}
+@keyframes pulseRed{
+  0%{box-shadow:0 0 0 0 rgba(255,82,82,0.6)}
+  70%{box-shadow:0 0 0 11px rgba(255,82,82,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,82,82,0)}
 }
 
-/* SQUARE HERO LOGO */
-.hero-logo{
-  position:relative;
-  margin-bottom:28px;
-  width:min(340px, 68vw);
-  animation:logoFloat 6s ease-in-out infinite;
+.logo-float{animation:float 6.5s ease-in-out infinite;margin-bottom:38px}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-16px)}
 }
-@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
-.hero-logo-inner{
+.logo-ring{
   position:relative;
+  width:min(340px,74vw);
   aspect-ratio:1/1;
-  border-radius:28px;
+  border-radius:36px;
   overflow:hidden;
-  box-shadow:
-    0 30px 80px rgba(41,171,226,.4),
-    0 0 60px rgba(255,229,0,.25),
-    inset 0 0 0 2px rgba(255,255,255,.1);
+  display:grid;place-items:center;
+  box-shadow:0 30px 70px rgba(0,0,0,0.55), 0 0 70px rgba(41,171,226,0.18);
 }
-.hero-logo-inner::before{
-  content:'';position:absolute;inset:-2px;z-index:2;border-radius:30px;
-  background:linear-gradient(135deg,var(--blue),var(--yellow),var(--blue));
-  background-size:200% 200%;
-  animation:borderRotate 4s linear infinite;
-  padding:2px;
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  opacity:.7;
-  pointer-events:none;
+.logo-ring::before{
+  content:'';
+  position:absolute;
+  inset:-60%;
+  background:conic-gradient(from 0deg,
+    var(--blue) 0deg,
+    var(--yellow) 90deg,
+    var(--blue) 180deg,
+    var(--yellow) 270deg,
+    var(--blue) 360deg);
+  animation:spin 7s linear infinite;
 }
-@keyframes borderRotate{
-  0%{background-position:0% 50%}
-  100%{background-position:200% 50%}
-}
-.hero-logo img{
-  width:100%;height:100%;object-fit:cover;display:block;
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-ring img{
+  position:relative;z-index:2;
+  width:calc(100% - 12px);
+  height:calc(100% - 12px);
+  object-fit:cover;
+  border-radius:29px;
+  background:var(--bg2);
 }
 
-.hero-logo-text{
+.hero-title{
   font-family:'Bungee',cursive;
-  font-size:clamp(38px,9vw,88px);
-  line-height:1;
-  color:var(--yellow);
-  letter-spacing:3px;
-  text-shadow:
-    -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000,
-    6px 6px 0 rgba(0,0,0,.5),
-    0 0 60px rgba(255,229,0,.5);
-  display:none;
+  font-size:clamp(30px,7vw,58px);
+  line-height:1.06;
+  letter-spacing:0.01em;
+  margin-bottom:22px;
+  background:linear-gradient(180deg,#ffffff 25%,#a9c2dc 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
-.hero-logo-inner.hidden{display:none}
-.hero-logo-inner.hidden + .hero-logo-text{display:block}
 
-.hero p.subtitle{
-  font-size:clamp(15px,1.7vw,18px);
-  color:var(--muted);
+.hero-sub{
+  font-size:clamp(15px,1.6vw,18px);
+  color:rgba(255,255,255,0.76);
   max-width:660px;
-  margin:8px 0 40px;
-  font-weight:500;
-}
-.hero p.subtitle b{color:var(--yellow);font-weight:700}
-.hero p.subtitle strong{
-  background:linear-gradient(90deg,var(--blue-light),var(--yellow));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;font-weight:800;
+  margin:0 auto 34px;
+  line-height:1.72;
 }
 
-.ip-box{
+/* ============ БЛОК IP ============ */
+
+.ip-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:34px;width:100%}
+
+.ip-card{
   display:inline-flex;align-items:center;gap:16px;
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:14px 24px;
-  border-radius:14px;
-  margin-bottom:14px;
-  cursor:pointer;
-  transition:.3s;
-  position:relative;
-  backdrop-filter:blur(20px);
-  box-shadow:0 8px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
+  padding:14px 16px 14px 24px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.055);
+  border:1px solid var(--border-strong);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  transition:transform .28s cubic-bezier(.2,.7,.3,1), border-color .28s ease, box-shadow .28s ease, background .28s ease;
+  max-width:100%;
 }
-.ip-box:hover{
-  border-color:var(--yellow);
-  background:var(--card-hover);
-  transform:translateY(-2px);
-  box-shadow:0 12px 40px rgba(255,229,0,.15), inset 0 1px 0 rgba(255,255,255,.1);
+.ip-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--border-glow);
+  background:rgba(41,171,226,0.09);
+  box-shadow:0 16px 38px rgba(41,171,226,0.24);
 }
-.ip-icon{font-size:22px}
+.ip-card.copied{border-color:rgba(74,222,128,0.7);box-shadow:0 16px 38px rgba(74,222,128,0.24)}
+.ip-text{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
 .ip-label{
-  font-size:10px;color:var(--muted);text-align:left;
-  font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;
+  font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:2px;
 }
 .ip-value{
-  font-family:'Bungee',cursive;font-size:15px;
-  color:var(--yellow);letter-spacing:1px;
-  text-shadow:0 0 20px rgba(255,229,0,.5);
-}
-.copied{
-  position:absolute;top:-48px;left:50%;
-  transform:translateX(-50%) translateY(10px) scale(.9);
-  background:var(--green);color:#080b14;
-  padding:8px 16px;border-radius:8px;
-  font-size:12px;font-weight:800;
-  opacity:0;transition:.35s;pointer-events:none;
-  white-space:nowrap;
-  box-shadow:0 8px 20px rgba(74,222,128,.4);
-}
-.copied.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
-
-.port-hint{
-  font-size:13px;color:var(--muted);
-  margin-bottom:36px;font-weight:600;
-}
-.port-hint b{
-  color:var(--blue-light);
-  background:rgba(41,171,226,.1);
-  padding:3px 10px;border-radius:6px;
-  border:1px solid rgba(41,171,226,.25);
   font-family:'Bungee',cursive;
-  font-size:12px;letter-spacing:1px;
+  font-size:clamp(17px,3.4vw,25px);
+  letter-spacing:0.02em;
+  color:#fff;
+  word-break:break-all;
 }
+.ip-copy-icon{
+  flex-shrink:0;
+  width:40px;height:40px;border-radius:12px;
+  display:grid;place-items:center;
+  background:linear-gradient(160deg,var(--blue),var(--blue-deep));
+  color:#fff;
+  transition:transform .28s ease, box-shadow .28s ease;
+}
+.ip-card:hover .ip-copy-icon{transform:scale(1.12);box-shadow:0 8px 22px rgba(41,171,226,0.5)}
+.ip-copy-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.hero-buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-
-.stats{
-  display:flex;gap:0;flex-wrap:wrap;justify-content:center;
-  margin-top:80px;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:8px;
-  backdrop-filter:blur(20px);
-  box-shadow:0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
-}
-.stat{padding:20px 34px;position:relative}
-.stat:not(:last-child)::after{
-  content:'';position:absolute;right:0;top:20%;bottom:20%;
-  width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.1),transparent);
-}
-.stat h3{
-  font-family:'Bungee',cursive;
-  font-size:24px;
-  background:linear-gradient(135deg,var(--yellow),var(--blue-light));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  margin-bottom:4px;letter-spacing:1px;
-}
-.stat p{
-  font-size:11px;color:var(--muted);
-  letter-spacing:2px;font-weight:700;
-  text-transform:uppercase;
-}
-
-/* SECTIONS */
-section{padding:120px 40px;max-width:1240px;margin:0 auto;position:relative}
-.section-title{text-align:center;margin-bottom:70px}
-.section-eyebrow{
-  display:inline-block;
-  font-size:12px;font-weight:800;
-  letter-spacing:3px;text-transform:uppercase;
-  color:var(--blue-light);
-  margin-bottom:16px;
-  padding:6px 16px;
-  background:rgba(41,171,226,.08);
-  border:1px solid rgba(41,171,226,.2);
-  border-radius:100px;
-}
-.section-title h2{
-  font-family:'Bungee',cursive;
-  font-size:clamp(28px,4.5vw,50px);
-  margin-bottom:18px;
-  line-height:1.1;
-  letter-spacing:2px;
-}
-.section-title h2 .accent{
-  background:linear-gradient(135deg,var(--yellow),var(--yellow-glow));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  position:relative;
-}
-.section-title h2 .accent::after{
-  content:'';position:absolute;left:0;right:0;bottom:-6px;height:4px;
-  background:linear-gradient(90deg,transparent,var(--yellow),transparent);
-  border-radius:4px;
-  filter:blur(2px);
-}
-.section-title p{color:var(--muted);font-size:16px;max-width:600px;margin:0 auto;font-weight:500}
-
-.glass{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:20px;
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  position:relative;overflow:hidden;
-  transition:.35s cubic-bezier(.2,.9,.3,1.3);
-  box-shadow:0 4px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
-}
-.glass::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
-}
-.glass:hover{
-  transform:translateY(-6px);
-  border-color:var(--border-glow);
-  background:var(--card-hover);
-  box-shadow:0 20px 50px rgba(0,0,0,.5), 0 0 40px rgba(41,171,226,.1), inset 0 1px 0 rgba(255,255,255,.1);
-}
-
-/* ABOUT */
-.about-card{
-  max-width:900px;margin:0 auto;
-  padding:50px 40px;text-align:center;
-}
-.about-card p{
-  color:var(--muted);font-size:17px;line-height:1.85;
-  margin-bottom:20px;
-}
-.about-card p b{color:var(--yellow);font-weight:700}
-.about-quote{
-  font-family:'Bungee',cursive;
-  font-size:15px;line-height:1.7;
-  letter-spacing:1px;
-  padding:28px 20px;margin:36px 0 0;
-  border-radius:14px;
-  background:linear-gradient(135deg, rgba(255,229,0,.08), rgba(41,171,226,.08));
-  border:1px solid rgba(255,229,0,.2);
+.ip-port{
+  font-size:14px;font-weight:600;
   color:var(--yellow);
-  text-shadow:0 0 30px rgba(255,229,0,.3);
-  position:relative;
+  letter-spacing:0.01em;
 }
 
-/* FEATURES */
-.features{
+.hero-buttons{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%}
+
+/* ============ ЧАСТИЦЫ ============ */
+
+.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.particle{
+  position:absolute;bottom:-24px;
+  border-radius:50%;
+  background:var(--yellow);
+  opacity:0;
+  animation:rise linear infinite;
+  will-change:transform,opacity;
+}
+@keyframes rise{
+  0%{transform:translate3d(0,0,0) scale(.6);opacity:0}
+  12%{opacity:.72}
+  80%{opacity:.42}
+  100%{transform:translate3d(var(--dx,0),-108vh,0) scale(1);opacity:0}
+}
+
+/* ============ СЕКЦИИ ============ */
+
+.section{
+  position:relative;
+  padding:104px 0;
+  scroll-margin-top:78px;
+}
+.section-head{margin-bottom:54px;text-align:center}
+.section-title{
+  font-family:'Bungee',cursive;
+  font-size:clamp(26px,4.6vw,44px);
+  line-height:1.12;
+  letter-spacing:0.015em;
+  text-transform:uppercase;
+  background:linear-gradient(180deg,#ffffff 30%,#9fb4d0 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.title-bar{
+  width:76px;height:4px;border-radius:4px;margin:20px auto 0;
+  background:linear-gradient(90deg,var(--blue),var(--yellow));
+  box-shadow:0 0 18px rgba(41,171,226,0.5);
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  transition:transform .35s cubic-bezier(.2,.7,.3,1), background .35s ease, border-color .35s ease, box-shadow .35s ease;
+  will-change:transform;
+}
+.card:hover{
+  transform:translateY(-6px);
+  background:var(--card-hover);
+  border-color:var(--border-glow);
+  box-shadow:0 22px 46px rgba(0,0,0,0.5), 0 0 0 1px rgba(41,171,226,0.12);
+}
+
+/* ============ СТАТУС ============ */
+
+.status-panel{
+  padding:34px;
+  border-radius:26px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.022));
+  border:1px solid var(--border-strong);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 26px 60px rgba(0,0,0,0.42);
+}
+.status-top{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  flex-wrap:wrap;margin-bottom:26px;
+}
+.status-top-left{display:flex;align-items:center;gap:14px;min-width:0}
+.status-pulse{
+  width:13px;height:13px;border-radius:50%;flex-shrink:0;
+  background:var(--muted);
+  animation:pulse 2s infinite;
+}
+.status-pulse.ok{background:var(--green)}
+.status-pulse.off{background:var(--red);animation-name:pulseRed}
+.status-headline{display:flex;flex-direction:column;min-width:0}
+.status-headline b{
+  font-family:'Bungee',cursive;font-size:19px;letter-spacing:0.02em;color:#fff;
+}
+.status-headline span{font-size:13px;color:var(--muted)}
+
+.refresh-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:10px 20px;border-radius:12px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border-strong);
+  color:rgba(255,255,255,0.85);
+  font-size:13.5px;font-weight:600;
+  transition:transform .28s ease, background .28s ease, border-color .28s ease, box-shadow .28s ease, color .28s ease;
+}
+.refresh-btn:hover{
+  transform:translateY(-3px);
+  background:rgba(41,171,226,0.14);
+  border-color:var(--border-glow);
+  color:#fff;
+  box-shadow:0 12px 28px rgba(41,171,226,0.26);
+}
+.refresh-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.refresh-btn.spinning svg{animation:spin 1s linear infinite}
+
+.status-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+.stat{
+  padding:20px 22px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.035);
+  border:1px solid var(--border);
+  transition:transform .3s cubic-bezier(.2,.7,.3,1), background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.stat:hover{
+  transform:translateY(-6px);
+  background:rgba(255,255,255,0.065);
+  border-color:var(--border-glow);
+  box-shadow:0 18px 36px rgba(0,0,0,0.4);
+}
+.stat-label{
+  font-size:11px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;
+}
+.stat-value{
+  font-family:'Bungee',cursive;
+  font-size:clamp(19px,2.6vw,26px);
+  line-height:1.1;
+  color:#fff;
+  display:flex;align-items:center;gap:9px;
+  word-break:break-word;
+}
+.stat-value.ok{color:var(--green)}
+.stat-value.off{color:var(--red)}
+.stat-value.pending{color:var(--muted)}
+.stat-value small{font-size:0.62em;color:var(--muted);font-family:'Inter',sans-serif;font-weight:600}
+.stat-dot{width:10px;height:10px;border-radius:50%;background:currentColor;flex-shrink:0}
+.stat-bar{
+  margin-top:12px;height:5px;border-radius:5px;
+  background:rgba(255,255,255,0.09);overflow:hidden;
+}
+.stat-bar i{
+  display:block;height:100%;width:0;border-radius:5px;
+  background:linear-gradient(90deg,var(--blue),var(--yellow));
+  transition:width .8s cubic-bezier(.2,.7,.3,1);
+}
+
+.status-motd{
+  margin-top:20px;padding:16px 20px;
+  border-radius:14px;
+  background:rgba(41,171,226,0.07);
+  border:1px solid rgba(41,171,226,0.2);
+  font-size:14px;color:rgba(255,255,255,0.8);
+  display:flex;gap:12px;align-items:flex-start;
+}
+.status-motd b{
+  flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:0.13em;
+  text-transform:uppercase;color:var(--blue-light);padding-top:3px;
+}
+.status-note{
+  margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center;
+}
+.status-note a{color:var(--blue-light);border-bottom:1px solid rgba(41,171,226,0.4)}
+.status-note a:hover{color:var(--yellow);border-bottom-color:rgba(255,229,0,0.5)}
+
+/* ============ О СЕРВЕРЕ ============ */
+
+.about-panel{
+  padding:44px clamp(24px,4vw,54px);
+  border-radius:26px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 26px 60px rgba(0,0,0,0.36);
+}
+.about-panel p{
+  font-size:clamp(15px,1.55vw,17.5px);
+  color:rgba(255,255,255,0.8);
+  line-height:1.85;
+  max-width:820px;margin:0 auto 20px;
+  text-align:center;
+}
+.about-panel p:last-of-type{margin-bottom:0}
+.quote{
+  position:relative;
+  margin:34px auto 0;
+  max-width:700px;
+  padding:24px 30px;
+  border-radius:18px;
+  background:rgba(255,229,0,0.06);
+  border:1px solid rgba(255,229,0,0.22);
+  font-size:clamp(15px,1.7vw,18.5px);
+  font-weight:600;
+  font-style:italic;
+  color:var(--yellow);
+  text-align:center;
+  line-height:1.6;
+}
+
+/* ============ НАПРАВЛЕНИЯ ============ */
+
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
   gap:22px;
 }
-.feature{padding:32px 28px;position:relative}
+.feature{
+  padding:32px 28px;
+  display:flex;flex-direction:column;
+}
 .feature-icon{
-  width:60px;height:60px;
-  background:linear-gradient(135deg, rgba(41,171,226,.15), rgba(255,229,0,.08));
-  border:1px solid rgba(41,171,226,.2);
-  border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;margin-bottom:22px;
-  transition:.35s;
+  width:60px;height:60px;border-radius:17px;
+  display:grid;place-items:center;
+  font-size:28px;line-height:1;
+  background:linear-gradient(160deg, rgba(41,171,226,0.22), rgba(255,229,0,0.12));
+  border:1px solid rgba(255,255,255,0.1);
+  margin-bottom:20px;
+  transition:transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease;
 }
 .feature:hover .feature-icon{
-  transform:scale(1.1) rotate(-5deg);
-  border-color:var(--yellow);
-  box-shadow:0 0 30px rgba(255,229,0,.25);
+  transform:scale(1.14) rotate(-4deg);
+  box-shadow:0 12px 28px rgba(41,171,226,0.3);
 }
 .feature h3{
   font-family:'Bungee',cursive;
-  font-size:16px;margin-bottom:12px;
-  letter-spacing:.5px;
+  font-size:17px;line-height:1.25;letter-spacing:0.015em;
+  color:#fff;margin-bottom:11px;
 }
-.feature p{color:var(--muted);font-size:14.5px;line-height:1.7}
+.feature p{
+  font-size:14.5px;line-height:1.7;color:var(--muted);
+}
 
-/* PC / STATUS */
-.pc-wrap{
+/* ============ КАК ИГРАТЬ ============ */
+
+.steps-grid{
   display:grid;
-  grid-template-columns:1fr 1.4fr;
-  gap:50px;align-items:center;
-  perspective:1400px;
-}
-.pc-tower{
-  position:relative;width:100%;max-width:320px;margin:0 auto;
-  aspect-ratio:1/1.35;
-  transition:transform .6s cubic-bezier(.2,.9,.3,1.3);
-  transform-style:preserve-3d;
-}
-.pc-tower:hover{transform:rotateY(-10deg) rotateX(6deg)}
-.pc-glass{
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,#0a0f18,#050810);
-  border-radius:18px;
-  border:1px solid rgba(41,171,226,.25);
-  overflow:hidden;
-  box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 60px rgba(41,171,226,.15),inset 0 0 40px rgba(0,0,0,.9);
-}
-.pc-glass::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);
-  pointer-events:none;
-}
-.pc-rgb{
-  position:absolute;top:0;left:0;right:0;height:5px;
-  background:linear-gradient(90deg,#ff00e0,#00fff0,#ff00e0,#00fff0,#ff00e0);
-  background-size:200% 100%;
-  animation:rgbMove 3s linear infinite;
-  box-shadow:0 0 25px rgba(255,0,224,.9),0 0 40px rgba(0,255,240,.7);
-  transition:.4s;
-  border-radius:18px 18px 0 0;
-}
-.pc-tower.offline .pc-rgb{background:#333;animation:none;box-shadow:none}
-@keyframes rgbMove{from{background-position:0 0}to{background-position:200% 0}}
-
-.pc-mobo{
-  position:absolute;inset:22px;
-  background:linear-gradient(135deg,#0d1520,#132030);
-  border-radius:12px;border:1px solid rgba(41,171,226,.15);
-  padding:16px;
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
-}
-.fan{
-  aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle,#0a0f18 30%,#1a2535 70%);
-  border:1px solid #223245;position:relative;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-.fan-blades{
-  width:85%;height:85%;border-radius:50%;
-  animation:spin 1.5s linear infinite;
-  position:relative;transition:.3s;
-}
-.fan-blades::before{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  background:conic-gradient(from 0deg,transparent 0deg 60deg,#29ABE2 60deg 90deg,transparent 90deg 180deg,#FFE500 180deg 210deg,transparent 210deg 300deg,#29ABE2 300deg 330deg,transparent 330deg);
-  filter:blur(1.5px);opacity:.9;
-}
-.fan::after{
-  content:'';position:absolute;width:22%;height:22%;
-  border-radius:50%;background:#0a0f18;
-  border:1px solid var(--blue);z-index:2;
-  box-shadow:0 0 10px var(--blue);
-}
-.pc-tower.offline .fan-blades{animation-play-state:paused;opacity:.3}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-
-.gpu{
-  grid-column:span 2;height:58px;
-  background:linear-gradient(135deg,#1a2535,#0f1825);
-  border-radius:10px;border:1px solid #223245;
-  display:flex;align-items:center;padding:0 16px;gap:10px;
-}
-.gpu-led{
-  width:9px;height:9px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 12px var(--green);
-  animation:blink 1.2s infinite;
-}
-.gpu-led:nth-child(2){animation-delay:.4s;background:var(--blue);box-shadow:0 0 12px var(--blue)}
-.gpu-led:nth-child(3){animation-delay:.8s;background:var(--yellow);box-shadow:0 0 12px var(--yellow)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.pc-tower.offline .gpu-led{background:#333;box-shadow:none;animation:none}
-
-.ram{grid-column:span 2;height:24px;display:flex;gap:6px}
-.ram span{
-  flex:1;background:linear-gradient(180deg,#2a3a52,#1a2535);
-  border-radius:3px;position:relative;overflow:hidden;
-}
-.ram span::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,229,0,.8),transparent);
-  transform:translateX(-100%);
-  animation:ramScan 2s infinite;
-}
-.ram span:nth-child(2)::before{animation-delay:.3s}
-.ram span:nth-child(3)::before{animation-delay:.6s}
-.ram span:nth-child(4)::before{animation-delay:.9s}
-@keyframes ramScan{to{transform:translateX(100%)}}
-.pc-tower.offline .ram span::before{animation:none;opacity:.2}
-
-.pc-front{
-  position:absolute;top:0;right:-18px;bottom:0;width:18px;
-  background:linear-gradient(180deg,#1a2535,#0f1825);
-  border-radius:0 12px 12px 0;
-  border:1px solid rgba(41,171,226,.25);border-left:none;
-  padding:22px 0;
-  display:flex;flex-direction:column;align-items:center;gap:14px;
-}
-.pc-power{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 15px var(--green);
-  transition:.3s;
-}
-.pc-tower.offline .pc-power{background:var(--red);box-shadow:0 0 15px var(--red)}
-.pc-vent{width:8px;height:22px;background:#0a0f18;border-radius:4px}
-.pc-stand{
-  position:absolute;bottom:-18px;left:20%;right:20%;height:18px;
-  background:linear-gradient(180deg,#1a2535,#0a0f18);
-  border-radius:0 0 14px 14px;
-  border:1px solid rgba(41,171,226,.15);border-top:none;
-}
-
-/* MONITOR */
-.monitor{position:relative}
-.monitor-frame{
-  background:linear-gradient(135deg,#1a2535,#0f1825);
-  border:1px solid rgba(41,171,226,.25);
-  border-radius:20px;padding:18px;
-  box-shadow:0 30px 60px rgba(0,0,0,.6), 0 0 60px rgba(41,171,226,.12);
-}
-.monitor-screen{
-  background:linear-gradient(180deg,#0a0f18,#06101a);
-  border-radius:12px;padding:22px;
-  min-height:460px;
-  font-family:'Courier New',monospace;
-  border:1px solid rgba(41,171,226,.2);
-  position:relative;overflow:hidden;
-}
-.monitor-screen::before{
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(0deg,rgba(41,171,226,.04) 0 1px,transparent 1px 3px);
-  pointer-events:none;z-index:2;
-}
-.screen-header{
-  display:flex;justify-content:space-between;align-items:center;
-  padding-bottom:16px;
-  border-bottom:1px solid rgba(41,171,226,.25);
-  margin-bottom:20px;
-  font-size:12px;font-weight:800;letter-spacing:.5px;
-  color:var(--blue-light);
-  position:relative;z-index:3;
-  flex-wrap:wrap;gap:8px;
-}
-.screen-status{
-  color:var(--yellow);font-weight:900;
-  transition:.3s;font-family:'Bungee',cursive;
-  letter-spacing:1px;font-size:11px;
-}
-.screen-status.online{color:var(--green);text-shadow:0 0 12px var(--green)}
-.screen-status.offline{color:var(--red);text-shadow:0 0 12px var(--red)}
-
-.screen-body{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:12px;margin-bottom:20px;
-  position:relative;z-index:3;
-}
-.metric{
-  background:rgba(41,171,226,.06);
-  border:1px solid rgba(41,171,226,.18);
-  border-radius:10px;padding:14px 16px;
-  transition:.3s;
-}
-.metric:hover{background:rgba(41,171,226,.1);border-color:rgba(41,171,226,.35)}
-.metric-full{grid-column:span 2}
-.metric-label{
-  display:block;font-size:10px;color:var(--muted);
-  text-transform:uppercase;letter-spacing:1.5px;
-  margin-bottom:6px;font-weight:800;
-}
-.metric-value{
-  font-size:15px;color:var(--yellow);font-weight:800;
-  font-family:'Courier New',monospace;word-break:break-word;
-  text-shadow:0 0 12px rgba(255,229,0,.4);
-}
-.metric-value.online{color:var(--green);text-shadow:0 0 12px rgba(74,222,128,.5)}
-.metric-value.offline{color:var(--red);text-shadow:0 0 12px rgba(255,82,82,.5)}
-
-.progress-bar-wrap{margin-top:6px;position:relative;z-index:3}
-.progress-label{
-  display:flex;justify-content:space-between;
-  font-size:11px;color:var(--muted);
-  margin-bottom:8px;font-weight:700;letter-spacing:.5px;
-}
-.progress-bar{
-  height:8px;background:rgba(41,171,226,.12);
-  border-radius:100px;overflow:hidden;
-  border:1px solid rgba(41,171,226,.2);
-}
-.progress-fill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,var(--blue),var(--yellow));
-  transition:width .8s ease;
-  box-shadow:0 0 20px rgba(255,229,0,.6);
-  border-radius:100px;
-}
-.screen-log{
-  margin-top:20px;padding-top:16px;
-  border-top:1px solid rgba(41,171,226,.2);
-  font-size:11px;color:var(--muted);
-  font-family:'Courier New',monospace;
-  max-height:120px;overflow:hidden;
-  position:relative;z-index:3;
-  line-height:1.8;
-}
-.screen-log div{animation:fadeIn .3s}
-.screen-log div span{color:var(--green)}
-@keyframes fadeIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-
-.monitor-stand{
-  width:80px;height:38px;
-  background:linear-gradient(180deg,#1a2535,#0f1825);
-  margin:0 auto;
-  clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);
-  border-left:1px solid rgba(41,171,226,.2);
-  border-right:1px solid rgba(41,171,226,.2);
-}
-.monitor-base{
-  width:200px;height:12px;
-  background:linear-gradient(180deg,#1a2535,#0a0f18);
-  border-radius:0 0 100px 100px;
-  margin:0 auto;
-  border:1px solid rgba(41,171,226,.15);border-top:none;
-}
-
-/* STEPS */
-.steps{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  grid-template-columns:repeat(4,1fr);
   gap:22px;
 }
-.step{padding:36px 26px;text-align:center;position:relative}
+.step{
+  position:relative;
+  padding:34px 26px 30px;
+  overflow:hidden;
+}
 .step-num{
-  width:58px;height:58px;
-  background:linear-gradient(135deg,var(--yellow),var(--yellow-glow));
-  color:#080b14;border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bungee',cursive;font-size:22px;
-  margin:0 auto 22px;
-  box-shadow:0 10px 30px rgba(255,229,0,.35), inset 0 1px 0 rgba(255,255,255,.5);
-  transform:rotate(-3deg);transition:.3s;
+  font-family:'Bungee',cursive;
+  font-size:44px;line-height:1;
+  background:linear-gradient(160deg,var(--blue),var(--yellow));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:16px;
+  transition:transform .35s cubic-bezier(.2,.7,.3,1);
+  display:block;
 }
-.step:hover .step-num{transform:rotate(3deg) scale(1.1)}
+.step:hover .step-num{transform:scale(1.14) translateX(4px)}
 .step h3{
-  font-family:'Bungee',cursive;font-size:15px;
-  margin-bottom:12px;letter-spacing:.5px;color:var(--yellow);
+  font-family:'Bungee',cursive;
+  font-size:16px;line-height:1.28;letter-spacing:0.015em;
+  color:#fff;margin-bottom:10px;
 }
-.step p{color:var(--muted);font-size:14.5px;line-height:1.7}
-.step p b{color:var(--blue-light);font-weight:800}
+.step p{font-size:14.5px;line-height:1.7;color:var(--muted)}
+.step::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--yellow));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .45s cubic-bezier(.2,.7,.3,1);
+}
+.step:hover::after{transform:scaleX(1)}
 
-/* RULES */
-.rules{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:18px;
-}
-.rule{
-  padding:24px 26px;
-  display:flex;gap:18px;align-items:flex-start;
-}
-.rule-icon{
-  font-size:24px;flex-shrink:0;margin-top:2px;
-  width:48px;height:48px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,rgba(41,171,226,.15),rgba(255,229,0,.08));
-  border:1px solid rgba(41,171,226,.2);
-  border-radius:12px;transition:.3s;
-}
-.rule:hover .rule-icon{border-color:var(--yellow);transform:scale(1.05)}
-.rule h4{font-size:15px;margin-bottom:6px;color:var(--text);font-weight:800}
-.rule p{color:var(--muted);font-size:13.5px;line-height:1.65}
+/* ============ СОЦСЕТИ ============ */
 
-/* SOCIALS */
 .socials-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:22px;
 }
 .social{
-  padding:34px 24px;text-align:center;
-  text-decoration:none;color:var(--text);display:block;
+  padding:30px 26px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:8px;
 }
 .social-icon{
-  font-size:40px;margin-bottom:18px;display:block;
-  filter:drop-shadow(0 4px 20px rgba(41,171,226,.4));
-  transition:.35s;
+  font-size:32px;line-height:1;
+  margin-bottom:8px;
+  transition:transform .35s cubic-bezier(.2,.7,.3,1);
 }
-.social:hover .social-icon{transform:scale(1.15) translateY(-4px)}
+.social:hover .social-icon{transform:scale(1.2) translateY(-3px)}
 .social h3{
-  font-family:'Bungee',cursive;font-size:16px;
-  margin-bottom:8px;color:var(--yellow);letter-spacing:.5px;
+  font-family:'Bungee',cursive;
+  font-size:16px;letter-spacing:0.02em;color:#fff;
 }
-.social p{color:var(--muted);font-size:13px;word-break:break-all;font-weight:600}
+.social span{
+  font-size:13.5px;color:var(--blue-light);font-weight:600;
+  word-break:break-all;
+}
+.social-arrow{
+  margin-top:8px;font-size:13px;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .3s ease, transform .3s ease;
+}
+.social:hover .social-arrow{color:var(--yellow);transform:translateX(4px)}
 
-/* FOOTER */
-footer{
-  padding:60px 40px 30px;
-  border-top:1px solid var(--border);
-  background:rgba(0,0,0,.3);
-  backdrop-filter:blur(20px);
+/* ============ ФУТЕР ============ */
+
+.footer{
   position:relative;
-}
-footer::before{
-  content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
-  background:linear-gradient(90deg,transparent,var(--blue),transparent);
-  filter:blur(1px);
-}
-.footer-content{
-  max-width:1200px;margin:0 auto;
-  display:grid;grid-template-columns:2fr 1fr 1fr;
-  gap:48px;margin-bottom:40px;
-}
-.footer-logo-wrap{
-  margin-bottom:18px;display:flex;align-items:center;gap:12px;
-}
-.footer-logo-img{
-  height:42px;width:auto;
-  filter:drop-shadow(0 4px 15px rgba(255,229,0,.25));
-  border-radius:4px;
-}
-.footer-logo-text{
-  display:none;font-family:'Bungee',cursive;font-size:16px;
-  color:var(--yellow);
-  text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 0 20px rgba(255,229,0,.4);
-  letter-spacing:1px;
-}
-.footer-logo-img.hidden + .footer-logo-text{display:block}
-.footer-content > div p{color:var(--muted);font-size:14px;line-height:1.7}
-.footer-col h4{
-  font-size:12px;margin-bottom:18px;color:var(--text);
-  letter-spacing:2px;text-transform:uppercase;font-weight:800;
-}
-.footer-col a{
-  display:block;color:var(--muted);text-decoration:none;
-  font-size:14px;padding:6px 0;transition:.25s;font-weight:500;
-}
-.footer-col a:hover{color:var(--yellow);padding-left:8px}
-.footer-bottom{
-  text-align:center;padding-top:30px;
+  margin-top:40px;
+  padding:56px 0 30px;
   border-top:1px solid var(--border);
-  color:var(--muted);font-size:13px;
-  max-width:1200px;margin:0 auto;
+  background:linear-gradient(180deg, rgba(255,255,255,0.022), transparent);
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1fr;
+  gap:44px;
+  align-items:start;
+}
+.footer-brand img{
+  height:42px;width:auto;border-radius:8px;margin-bottom:16px;
+  box-shadow:0 6px 18px rgba(41,171,226,0.24);
+}
+.footer-brand p{
+  font-size:14px;line-height:1.72;color:var(--muted);max-width:340px;
+}
+.footer-col h4{
+  font-family:'Bungee',cursive;
+  font-size:13px;letter-spacing:0.09em;text-transform:uppercase;
+  color:#fff;margin-bottom:16px;
+}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col a{
+  font-size:14.5px;color:var(--muted);
+  transition:color .25s ease, transform .25s ease;
+  display:inline-block;
+}
+.footer-col a:hover{color:var(--yellow);transform:translateX(4px)}
+.footer-bottom{
+  margin-top:44px;padding-top:24px;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-size:13.5px;color:var(--muted);
 }
 
-/* REVEAL */
-.reveal{opacity:0;transform:translateY(40px);transition:.9s cubic-bezier(.2,.9,.3,1)}
-.reveal.active{opacity:1;transform:translateY(0)}
+/* ============ ТОСТ ============ */
 
-/* MOBILE */
-@media(max-width:1000px){
-  .pc-wrap{grid-template-columns:1fr;gap:60px}
-  .pc-tower{max-width:280px}
+.toast{
+  position:fixed;left:50%;bottom:34px;z-index:999;
+  transform:translate(-50%,90px);
+  opacity:0;pointer-events:none;
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 26px;
+  border-radius:100px;
+  background:linear-gradient(160deg,#FFF45C,var(--yellow-glow));
+  color:#0a0d14;
+  font-size:15px;font-weight:800;
+  box-shadow:0 18px 44px rgba(255,229,0,0.34);
+  transition:transform .38s cubic-bezier(.2,.7,.3,1), opacity .38s ease;
 }
-@media(max-width:768px){
-  header{padding:10px 14px}
-  .logo-banner{height:36px}
-  .logo-fallback{font-size:12px}
-  nav{display:none}
-  section{padding:80px 18px}
-  .hero{padding:120px 18px 60px}
-  .footer-content{grid-template-columns:1fr;gap:36px}
-  .stats{gap:0;margin-top:60px;padding:4px}
-  .stat{padding:16px 18px;flex:1 1 45%}
-  .stat:nth-child(2)::after{display:none}
-  .stat h3{font-size:18px}
-  .stat p{font-size:10px;letter-spacing:1px}
-  .hero-buttons{flex-direction:column;width:100%;max-width:320px}
-  .hero-buttons .btn{width:100%;text-align:center}
-  .ip-box{flex-direction:row;gap:10px;padding:12px 16px;width:100%;max-width:340px}
-  .ip-value{font-size:11px}
-  .about-quote{font-size:11px;padding:22px 14px;letter-spacing:.5px}
-  .about-card{padding:34px 22px}
-  footer{padding:50px 18px 24px}
-  .screen-body{grid-template-columns:1fr}
-  .metric-full{grid-column:span 1}
-  .monitor-screen{min-height:auto;padding:16px}
-  .section-title h2{letter-spacing:1px}
-  .hero-logo{width:min(280px, 72vw)}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
+/* ============ ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ============ */
+
+.reveal{
+  opacity:0;
+  transform:translateY(30px);
+  transition:opacity .75s cubic-bezier(.2,.7,.3,1), transform .75s cubic-bezier(.2,.7,.3,1);
+}
+.reveal.visible{opacity:1;transform:none}
+
+/* ============ ПЛАНШЕТЫ ============ */
+
+@media (max-width:1080px){
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-grid{grid-template-columns:repeat(2,1fr)}
+  .socials-grid{grid-template-columns:repeat(2,1fr)}
+  .status-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+@media (max-width:980px){
+  .nav a{padding:8px 11px;font-size:13.5px}
+  .header-logo img{height:42px}
+  .section{padding:84px 0}
+}
+
+/* ============ МОБИЛЬНЫЕ ============ */
+
+@media (max-width:768px){
+  .nav{display:none}
+
+  .header{padding:12px 0}
+  .header.scrolled{padding:7px 0}
+  .header-logo img{height:36px}
+  .header.scrolled .header-logo img{height:32px}
+  .header-inner{gap:12px}
+  .btn-sm{padding:10px 18px;font-size:13.5px}
+
+  .container{padding:0 18px}
+
+  .hero{padding:110px 18px 70px;min-height:auto}
+  .badge{font-size:12.5px;padding:8px 16px 8px 13px;margin-bottom:26px}
+  .logo-float{margin-bottom:28px}
+  .logo-ring{width:min(260px,72vw);border-radius:30px}
+  .logo-ring img{border-radius:24px}
+  .hero-title{font-size:clamp(26px,8.6vw,38px);margin-bottom:16px}
+  .hero-sub{font-size:14.5px;line-height:1.68;margin-bottom:26px}
+
+  .ip-wrap{margin-bottom:26px}
+  .ip-card{padding:12px 13px 12px 18px;gap:12px;width:100%;justify-content:space-between}
+  .ip-value{font-size:16px}
+  .ip-copy-icon{width:36px;height:36px;border-radius:10px}
+  .ip-copy-icon svg{width:17px;height:17px}
+
+  .hero-buttons{flex-direction:column;gap:12px}
+  .hero-buttons .btn{width:100%}
+
+  .section{padding:66px 0;scroll-margin-top:64px}
+  .section-head{margin-bottom:36px}
+  .section-title{font-size:clamp(22px,7vw,30px)}
+  .title-bar{width:60px;margin-top:16px}
+
+  .status-panel{padding:22px 18px;border-radius:20px}
+  .status-top{margin-bottom:20px}
+  .status-headline b{font-size:16px}
+  .status-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .stat{padding:16px 15px}
+  .stat-label{font-size:10px;letter-spacing:0.1em;margin-bottom:8px}
+  .stat-value{font-size:17px;gap:7px}
+  .status-motd{padding:14px 16px;flex-direction:column;gap:6px;font-size:13.5px}
+
+  .about-panel{padding:28px 20px;border-radius:20px}
+  .about-panel p{font-size:14.5px;line-height:1.78;margin-bottom:16px}
+  .quote{padding:18px 20px;font-size:15px;margin-top:24px}
+
+  .features-grid,.steps-grid,.socials-grid{grid-template-columns:1fr;gap:16px}
+  .feature{padding:26px 22px}
+  .feature-icon{width:54px;height:54px;font-size:25px;margin-bottom:16px}
+  .feature h3{font-size:16px}
+  .step{padding:28px 22px 26px}
+  .step-num{font-size:38px;margin-bottom:12px}
+  .social{padding:26px 22px}
+
+  .footer{padding:44px 0 26px}
+  .footer-grid{grid-template-columns:1fr;gap:32px}
+  .footer-brand p{max-width:none}
+  .footer-bottom{margin-top:32px;font-size:12.5px}
+
+  .toast{bottom:22px;padding:12px 20px;font-size:14px;width:calc(100% - 36px);justify-content:center}
+}
+
+@media (max-width:380px){
+  .header-logo img{height:32px}
+  .btn-sm{padding:9px 14px;font-size:12.5px}
+  .stat-value{font-size:15px}
+}
+
+/* ============ ДОСТУПНОСТЬ ============ */
+
+:focus-visible{
+  outline:2px solid var(--yellow);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .reveal{opacity:1;transform:none}
 }
 </style>
 </head>
 <body>
 
-<header id="header">
-  <div class="logo-wrap">
-    <!-- Баннер SVG в шапке -->
-    <img src="logo-banner.svg" alt="BEBRA MAXIMUM" class="logo-banner" onerror="this.classList.add('hidden')">
-    <span class="logo-fallback">BEBRA-MAXIMUM</span>
-  </div>
-  <nav>
-    <a href="#about">О сервере</a>
-    <a href="#features">Особенности</a>
-    <a href="#status">Статус</a>
-    <a href="#join">Как играть</a>
-    <a href="#rules">Правила</a>
-    <a href="#socials">Контакты</a>
-  </nav>
-  <a href="#join" class="btn">Играть</a>
-</header>
+<!-- ============ ШАПКА ============ -->
+<header class="header" id="header">
+  <div class="container header-inner">
+    <a class="header-logo" href="#top" aria-label="BEBRA-MAXIMUM — на главную">
+      <img src="logo-banner.jpg" alt="BEBRA-MAXIMUM" data-fallback-size="sm" onerror="logoFallback(this)">
+    </a>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="particle" style="left:10%;animation-delay:0s"></div>
-  <div class="particle" style="left:25%;animation-delay:2s"></div>
-  <div class="particle" style="left:45%;animation-delay:4s"></div>
-  <div class="particle" style="left:65%;animation-delay:1s"></div>
-  <div class="particle" style="left:80%;animation-delay:3s"></div>
-  <div class="particle" style="left:92%;animation-delay:5s"></div>
-
-  <div class="badge">
-    <span class="dot"></span>
-    Сервер онлайн · Кросс-платформа
-  </div>
-
-  <!-- Квадратный SVG-логотип в hero -->
-  <div class="hero-logo">
-    <div class="hero-logo-inner">
-      <img src="logo-square.svg" alt="BEBRA MAXIMUM" onerror="this.parentElement.classList.add('hidden')">
-    </div>
-    <div class="hero-logo-text">BEBRA-MAXIMUM</div>
-  </div>
-
-  <p class="subtitle">
-    ❤️ Салам, джигитер! <b>Самый лучший кросс-платформенный сервер</b> — играй как с телефона, так и с ПК. <strong>Уютная майнкрафт-деревня</strong>, ивенты, квесты и прокачка навыков.
-  </p>
-
-  <div class="ip-box" onclick="copyIP(this)">
-    <span class="ip-icon">🎮</span>
-    <div>
-      <div class="ip-label">IP сервера</div>
-      <div class="ip-value" id="serverIP">bebra-maximum.ru</div>
-    </div>
-    <span class="copied">✓ Скопировано!</span>
-  </div>
-
-  <p class="port-hint">📱 Порт для Bedrock (телефон): <b>19709</b></p>
-
-  <div class="hero-buttons">
-    <a href="#join" class="btn">Как подключиться</a>
-    <a href="https://discord.gg/CfSu8cgV" target="_blank" class="btn btn-outline">Discord сервер</a>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><h3>1.21+</h3><p>Версия Java</p></div>
-    <div class="stat"><h3>24/7</h3><p>Онлайн</p></div>
-    <div class="stat"><h3>PC+📱</h3><p>Кросс-платформа</p></div>
-    <div class="stat"><h3>0</h3><p>RTP и китов</p></div>
-  </div>
-</section>
-
-<!-- STATUS -->
-<section id="status">
-  <div class="section-title reveal">
-    <div class="section-eyebrow">Live Monitor</div>
-    <h2>Связь с <span class="accent">сервером</span></h2>
-    <p>Прямое подключение к игровому ядру в реальном времени</p>
-  </div>
-
-  <div class="pc-wrap reveal">
-    <div class="pc-tower" id="pcTower">
-      <div class="pc-glass">
-        <div class="pc-rgb"></div>
-        <div class="pc-mobo">
-          <div class="fan"><div class="fan-blades"></div></div>
-          <div class="fan"><div class="fan-blades"></div></div>
-          <div class="gpu">
-            <span class="gpu-led"></span>
-            <span class="gpu-led"></span>
-            <span class="gpu-led"></span>
-          </div>
-          <div class="ram"><span></span><span></span><span></span><span></span></div>
-        </div>
-      </div>
-      <div class="pc-front">
-        <div class="pc-power" id="pcPower"></div>
-        <div class="pc-vent"></div>
-        <div class="pc-vent"></div>
-        <div class="pc-vent"></div>
-        <div class="pc-vent"></div>
-      </div>
-      <div class="pc-stand"></div>
-    </div>
-
-    <div class="monitor">
-      <div class="monitor-frame">
-        <div class="monitor-screen">
-          <div class="screen-header">
-            <span>💻 BEBRA-MAXIMUM :: CONSOLE</span>
-            <span class="screen-status" id="connStatus">● CONNECTING...</span>
-          </div>
-          <div class="screen-body">
-            <div class="metric">
-              <span class="metric-label">🌐 IP</span>
-              <span class="metric-value" id="statIP">bebra-maximum.ru</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">👥 Онлайн</span>
-              <span class="metric-value" id="statPlayers">— / —</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">📡 Пинг</span>
-              <span class="metric-value" id="statPing">—</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">🎮 Версия</span>
-              <span class="metric-value" id="statVersion">—</span>
-            </div>
-            <div class="metric metric-full">
-              <span class="metric-label">📝 MOTD</span>
-              <span class="metric-value" id="statMotd">Загрузка...</span>
-            </div>
-          </div>
-          <div class="progress-bar-wrap">
-            <div class="progress-label">
-              <span>Загрузка ядра</span>
-              <span id="loadPercent">0%</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" id="loadBar"></div></div>
-          </div>
-          <div class="screen-log" id="screenLog">
-            <div>▸ Инициализация подключения...</div>
-          </div>
-        </div>
-      </div>
-      <div class="monitor-stand"></div>
-      <div class="monitor-base"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-title reveal">
-    <div class="section-eyebrow">О проекте</div>
-    <h2>О <span class="accent">сервере</span></h2>
-  </div>
-  <div class="about-card glass reveal">
-    <p>Мы создали <b>комфортную Minecraft-деревню</b> — место, где хочется строить, общаться и развиваться. Минимум плагинов, чтобы сохранить <b>ванильный стиль игры</b>, но при этом разнообразить рутинные задачи и добавить больше способов самовыражения.</p>
-    <p>Никаких RTP, китов и прочего — только <b>чистый геймплей</b>, который мы все любим.</p>
-    <div class="about-quote">«Ждём активных и творческих игроков на нашем сервере!»</div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="section-title reveal">
-    <div class="section-eyebrow">Направления</div>
-    <h2>Чем можно <span class="accent">заняться</span></h2>
-    <p>Основные активности на Bebra Maximum</p>
-  </div>
-
-  <div class="features">
-    <div class="feature glass reveal"><div class="feature-icon">🏗️</div><h3>Строительство</h3><p>Создавай деревню своей мечты, строй общие проекты и воплощай самые смелые идеи вместе с другими игроками.</p></div>
-    <div class="feature glass reveal"><div class="feature-icon">🎉</div><h3>Ивенты</h3><p>Регулярные события: конкурсы, мини-игры, коллективные стройки и праздничные мероприятия.</p></div>
-    <div class="feature glass reveal"><div class="feature-icon">📜</div><h3>Квесты</h3><p>Интересные задания, за которые можно получить награды и прокачать своего персонажа.</p></div>
-    <div class="feature glass reveal"><div class="feature-icon">⚔️</div><h3>Прокачка навыков</h3><p>Развивай своего персонажа в разных направлениях и открывай новые возможности.</p></div>
-    <div class="feature glass reveal"><div class="feature-icon">🌿</div><h3>Ванильный стиль</h3><p>Минимум плагинов — максимум чистого Minecraft. Никаких RTP, китов и лишнего шума.</p></div>
-    <div class="feature glass reveal"><div class="feature-icon">📱</div><h3>Кросс-платформа</h3><p>Играй откуда угодно — с телефона (Bedrock) или с ПК (Java). Все вместе на одном сервере.</p></div>
-  </div>
-</section>
-
-<!-- JOIN -->
-<section id="join">
-  <div class="section-title reveal">
-    <div class="section-eyebrow">Быстрый старт</div>
-    <h2>Как <span class="accent">играть</span></h2>
-    <p>Подключение займёт меньше минуты</p>
-  </div>
-
-  <div class="steps">
-    <div class="step glass reveal"><div class="step-num">1</div><h3>Скачай Minecraft</h3><p>Java Edition для ПК или Bedrock Edition для телефона / консоли.</p></div>
-    <div class="step glass reveal"><div class="step-num">2</div><h3>Добавь сервер</h3><p>Открой «Сетевая игра» → «Добавить сервер» и впиши IP.</p></div>
-    <div class="step glass reveal"><div class="step-num">3</div><h3>Bedrock порт</h3><p>Укажи порт <b>19709</b> в настройках подключения.</p></div>
-    <div class="step glass reveal"><div class="step-num">4</div><h3>Заходи в игру!</h3><p>Добро пожаловать в нашу уютную деревню 🎮</p></div>
-  </div>
-</section>
-
-<!-- RULES -->
-<section id="rules">
-  <div class="section-title reveal">
-    <div class="section-eyebrow">Порядок</div>
-    <h2>Правила <span class="accent">сервера</span></h2>
-    <p>Чтобы всем было комфортно играть</p>
-  </div>
-
-  <div class="rules">
-    <div class="rule glass reveal"><div class="rule-icon">🤝</div><div><h4>Уважай других</h4><p>Без оскорблений, травли и токсичности. Мы тут для хорошего времяпровождения.</p></div></div>
-    <div class="rule glass reveal"><div class="rule-icon">🚫</div><div><h4>Без гриферства</h4><p>Не ломай чужие постройки и не воруй из сундуков. Стройте вместе!</p></div></div>
-    <div class="rule glass reveal"><div class="rule-icon">💬</div><div><h4>Без спама и рекламы</h4><p>Не флуди в чате и не рекламируй сторонние проекты.</p></div></div>
-    <div class="rule glass reveal"><div class="rule-icon">🛡️</div><div><h4>Без читов</h4><p>X-Ray, килл-аура, флай и другие читы запрещены. Играем честно.</p></div></div>
-    <div class="rule glass reveal"><div class="rule-icon">🎭</div><div><h4>Без дюпов</h4><p>Использование багов для получения предметов запрещено.</p></div></div>
-    <div class="rule glass reveal"><div class="rule-icon">👑</div><div><h4>Слушайся админов</h4><p>Решения администрации окончательны и обсуждению не подлежат.</p></div></div>
-  </div>
-</section>
-
-<!-- SOCIALS -->
-<section id="socials">
-  <div class="section-title reveal">
-    <div class="section-eyebrow">Будь на связи</div>
-    <h2>Наши <span class="accent">соцсети</span></h2>
-    <p>Подписывайся, чтобы не пропустить ивенты</p>
-  </div>
-
-  <div class="socials-grid">
-    <a href="https://discord.gg/CfSu8cgV" target="_blank" class="social glass reveal"><span class="social-icon">💬</span><h3>Discord</h3><p>discord.gg/CfSu8cgV</p></a>
-    <a href="https://t.me/bebra_maximum" target="_blank" class="social glass reveal"><span class="social-icon">✈️</span><h3>Telegram</h3><p>@bebra_maximum</p></a>
-    <a href="https://tiktok.com/@bebra.maximum" target="_blank" class="social glass reveal"><span class="social-icon">🎵</span><h3>TikTok</h3><p>@bebra.maximum</p></a>
-    <a href="https://vk.com/bebra_maximum" target="_blank" class="social glass reveal"><span class="social-icon">🔵</span><h3>ВКонтакте</h3><p>vk.com/bebra_maximum</p></a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-content">
-    <div>
-      <div class="footer-logo-wrap">
-        <!-- Баннер SVG в футере -->
-        <img src="logo-banner.svg" alt="BEBRA MAXIMUM" class="footer-logo-img" onerror="this.classList.add('hidden')">
-        <span class="footer-logo-text">BEBRA-MAXIMUM</span>
-      </div>
-      <p>Уютный кросс-платформенный Minecraft-сервер. Играй с телефона или ПК — где угодно и когда угодно!</p>
-    </div>
-    <div class="footer-col">
-      <h4>Навигация</h4>
+    <nav class="nav" aria-label="Основная навигация">
       <a href="#about">О сервере</a>
       <a href="#features">Особенности</a>
-      <a href="#status">Статус</a>
-      <a href="#join">Как играть</a>
-      <a href="#rules">Правила</a>
+      <a href="#how">Как играть</a>
+      <a href="#socials">Контакты</a>
+    </nav>
+
+    <a class="btn btn-primary btn-sm" href="#how">Играть</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero">
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <div class="badge" id="heroBadge">
+      <span class="dot" aria-hidden="true"></span>
+      Сервер онлайн · Кросс-платформа
     </div>
-    <div class="footer-col">
-      <h4>Мы в сети</h4>
-      <a href="https://discord.gg/CfSu8cgV" target="_blank">Discord</a>
-      <a href="https://t.me/bebra_maximum" target="_blank">Telegram</a>
-      <a href="https://tiktok.com/@bebra.maximum" target="_blank">TikTok</a>
-      <a href="https://vk.com/bebra_maximum" target="_blank">ВКонтакте</a>
+
+    <div class="logo-float">
+      <div class="logo-ring">
+        <img src="logo-square.jpg" alt="Логотип BEBRA-MAXIMUM" data-fallback-size="lg" onerror="logoFallback(this)">
+      </div>
+    </div>
+
+    <h1 class="hero-title">BEBRA-MAXIMUM</h1>
+
+    <p class="hero-sub">
+      ❤️ Салам, джигитер! Самый лучший кросс-платформенный сервер — играй как с телефона,
+      так и с ПК. Уютная майнкрафт-деревня, ивенты, квесты и прокачка навыков.
+    </p>
+
+    <div class="ip-wrap">
+      <div class="ip-card" id="ipCard" role="button" tabindex="0"
+           aria-label="Скопировать IP сервера bebra-maximum.ru">
+        <span class="ip-text">
+          <span class="ip-label">IP сервера</span>
+          <span class="ip-value" id="ipValue">bebra-maximum.ru</span>
+        </span>
+        <span class="ip-copy-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </span>
+      </div>
+      <span class="ip-port">📱 Порт для Bedrock (телефон): 19709</span>
+    </div>
+
+    <div class="hero-buttons">
+      <a class="btn btn-primary" href="#how">Как подключиться</a>
+      <a class="btn btn-discord" href="https://discord.gg/CfSu8cgV" target="_blank" rel="noopener noreferrer">Discord сервер</a>
     </div>
   </div>
-  <div class="footer-bottom">© 2025 Bebra Maximum · Сделано с ❤️ для джигитеров</div>
+</section>
+
+<!-- ============ СТАТУС СЕРВЕРА ============ -->
+<section class="section" id="status">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="section-title">Статус сервера</h2>
+      <div class="title-bar"></div>
+    </div>
+
+    <div class="status-panel reveal">
+      <div class="status-top">
+        <div class="status-top-left">
+          <span class="status-pulse" id="statusPulse" aria-hidden="true"></span>
+          <span class="status-headline">
+            <b id="statusHeadline">Проверяем сервер…</b>
+            <span id="statusSub">Запрос к серверу bebra-maximum.ru</span>
+          </span>
+        </div>
+        <button class="refresh-btn" id="refreshBtn" type="button" aria-label="Обновить статус сервера">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+            <path d="M21 3v6h-6"></path>
+          </svg>
+          Обновить
+        </button>
+      </div>
+
+      <div class="status-grid">
+        <div class="stat">
+          <div class="stat-label">Java Edition</div>
+          <div class="stat-value pending" id="statJava">
+            <span class="stat-dot" aria-hidden="true"></span>
+            <span>—</span>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Игроков онлайн</div>
+          <div class="stat-value pending" id="statPlayers">—</div>
+          <div class="stat-bar"><i id="statPlayersBar"></i></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Bedrock · порт 19709</div>
+          <div class="stat-value pending" id="statBedrock">
+            <span class="stat-dot" aria-hidden="true"></span>
+            <span>—</span>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Обновлено</div>
+          <div class="stat-value pending" id="statUpdated">—</div>
+        </div>
+      </div>
+
+      <div class="status-motd" id="statusMotd" hidden>
+        <b>MOTD</b>
+        <span id="statusMotdText"></span>
+      </div>
+
+      <p class="status-note">
+        Данные берутся в реальном времени из открытого API
+        <a href="https://mcsrvstat.us" target="_blank" rel="noopener noreferrer">mcsrvstat.us</a>
+        и обновляются автоматически раз в минуту.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ О СЕРВЕРЕ ============ -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="section-title">О сервере</h2>
+      <div class="title-bar"></div>
+    </div>
+
+    <div class="about-panel reveal">
+      <p>
+        Мы создали комфортную Minecraft-деревню — место, где хочется строить, общаться
+        и развиваться. Минимум плагинов, чтобы сохранить ванильный стиль игры, но при
+        этом разнообразить рутинные задачи и добавить больше способов самовыражения.
+      </p>
+      <p>
+        Никаких RTP, китов и прочего — только чистый геймплей, который мы все любим.
+      </p>
+      <div class="quote">«Ждём активных и творческих игроков на нашем сервере!»</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ НАПРАВЛЕНИЯ ============ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="section-title">Основные направления</h2>
+      <div class="title-bar"></div>
+    </div>
+
+    <div class="features-grid">
+      <article class="card feature reveal">
+        <div class="feature-icon" aria-hidden="true">🏗️</div>
+        <h3>Строительство</h3>
+        <p>Создавай деревню своей мечты, строй общие проекты и воплощай самые смелые идеи вместе с другими игроками.</p>
+      </article>
+
+      <article class="card feature reveal">
+        <div class="feature-icon" aria-hidden="true">🎉</div>
+        <h3>Ивенты</h3>
+        <p>Регулярные события: конкурсы, мини-игры, коллективные стройки и праздничные мероприятия.</p>
+      </article>
+
+      <article class="card feature reveal">
+        <div class="feature-icon" aria-hidden="true">📜</div>
+        <h3>Квесты</h3>
+        <p>Интересные задания, за которые можно получить награды и прокачать своего персонажа.</p>
+      </article>
+
+      <article class="card feature reveal">
+        <div class="feature-icon" aria-hidden="true">⚔️</div>
+        <h3>Прокачка навыков</h3>
+        <p>Развивай своего персонажа в разных направлениях и открывай новые возможности.</p>
+      </article>
+
+      <article class="card feature reveal">
+        <div class="feature-icon" aria-hidden="true">🌿</div>
+        <h3>Ванильный стиль</h3>
+        <p>Минимум плагинов — максимум чистого Minecraft. Никаких RTP, китов и лишнего шума.</p>
+      </article>
+
+      <article class="card feature reveal">
+        <div class="feature-icon" aria-hidden="true">📱</div>
+        <h3>Кросс-платформа</h3>
+        <p>Играй откуда угодно — с телефона (Bedrock) или с ПК (Java). Все вместе на одном сервере.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ КАК ИГРАТЬ ============ -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="section-title">Как играть</h2>
+      <div class="title-bar"></div>
+    </div>
+
+    <div class="steps-grid">
+      <article class="card step reveal">
+        <span class="step-num">01</span>
+        <h3>Скачай Minecraft</h3>
+        <p>Java Edition для ПК или Bedrock Edition для телефона / консоли.</p>
+      </article>
+
+      <article class="card step reveal">
+        <span class="step-num">02</span>
+        <h3>Добавь сервер</h3>
+        <p>Открой «Сетевая игра» → «Добавить сервер» и впиши IP.</p>
+      </article>
+
+      <article class="card step reveal">
+        <span class="step-num">03</span>
+        <h3>Bedrock порт</h3>
+        <p>Укажи порт 19709 в настройках подключения.</p>
+      </article>
+
+      <article class="card step reveal">
+        <span class="step-num">04</span>
+        <h3>Заходи в игру!</h3>
+        <p>Добро пожаловать в нашу уютную деревню 🎮</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ СОЦСЕТИ ============ -->
+<section class="section" id="socials">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="section-title">Наши соцсети</h2>
+      <div class="title-bar"></div>
+    </div>
+
+    <div class="socials-grid">
+      <a class="card social reveal" href="https://discord.gg/CfSu8cgV" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon" aria-hidden="true">💬</span>
+        <h3>Discord</h3>
+        <span>discord.gg/CfSu8cgV</span>
+        <span class="social-arrow">Перейти →</span>
+      </a>
+
+      <a class="card social reveal" href="https://t.me/bebra_maximum" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon" aria-hidden="true">✈️</span>
+        <h3>Telegram</h3>
+        <span>@bebra_maximum</span>
+        <span class="social-arrow">Перейти →</span>
+      </a>
+
+      <a class="card social reveal" href="https://www.tiktok.com/@bebra.maximum" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon" aria-hidden="true">🎵</span>
+        <h3>TikTok</h3>
+        <span>@bebra.maximum</span>
+        <span class="social-arrow">Перейти →</span>
+      </a>
+
+      <a class="card social reveal" href="https://vk.com/bebra_maximum" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon" aria-hidden="true">🔵</span>
+        <h3>ВКонтакте</h3>
+        <span>vk.com/bebra_maximum</span>
+        <span class="social-arrow">Перейти →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ ФУТЕР ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="logo-banner.jpg" alt="BEBRA-MAXIMUM" data-fallback-size="sm" onerror="logoFallback(this)">
+        <p>Кросс-платформенный Minecraft-сервер: уютная деревня, ивенты, квесты и прокачка навыков. Играй с телефона или с ПК.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Навигация</h4>
+        <ul>
+          <li><a href="#about">О сервере</a></li>
+          <li><a href="#features">Особенности</a></li>
+          <li><a href="#status">Статус сервера</a></li>
+          <li><a href="#how">Как играть</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Соцсети</h4>
+        <ul>
+          <li><a href="https://discord.gg/CfSu8cgV" target="_blank" rel="noopener noreferrer">Discord</a></li>
+          <li><a href="https://t.me/bebra_maximum" target="_blank" rel="noopener noreferrer">Telegram</a></li>
+          <li><a href="https://www.tiktok.com/@bebra.maximum" target="_blank" rel="noopener noreferrer">TikTok</a></li>
+          <li><a href="https://vk.com/bebra_maximum" target="_blank" rel="noopener noreferrer">ВКонтакте</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 Bebra Maximum · Сделано с ❤️ для джигитеров
+    </div>
+  </div>
 </footer>
 
+<div class="toast" id="toast" role="status" aria-live="polite">✓ Скопировано!</div>
+
 <script>
-const SERVER = {
-  ip: 'bebra-maximum.ru',
-  bedrockPort: 19709,
-  apiBase: 'https://api.mcstatus.io/v2/status/java/'
-};
+(function(){
+  'use strict';
 
-function copyIP(el){
-  const ip = document.getElementById('serverIP').innerText;
-  navigator.clipboard.writeText(ip).then(() => {
-    const tip = el.querySelector('.copied');
-    tip.classList.add('show');
-    logToConsole(`IP ${ip} скопирован`);
-    setTimeout(() => tip.classList.remove('show'), 1600);
-  });
-}
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function logToConsole(text){
-  const log = document.getElementById('screenLog');
-  if(!log) return;
-  const line = document.createElement('div');
-  const time = new Date().toLocaleTimeString('ru-RU', {hour12:false});
-  line.innerHTML = `[${time}] <span>▸</span> ${text}`;
-  log.prepend(line);
-  while(log.children.length > 6) log.removeChild(log.lastChild);
-}
-
-function setProgress(percent){
-  const bar = document.getElementById('loadBar');
-  const label = document.getElementById('loadPercent');
-  if(!bar || !label) return;
-  bar.style.width = percent + '%';
-  label.textContent = Math.round(percent) + '%';
-}
-
-async function fetchServerStatus(){
-  const tower = document.getElementById('pcTower');
-  const statusEl = document.getElementById('connStatus');
-  const playersEl = document.getElementById('statPlayers');
-  const pingEl = document.getElementById('statPing');
-  const versionEl = document.getElementById('statVersion');
-  const motdEl = document.getElementById('statMotd');
-  const ipEl = document.getElementById('statIP');
-
-  ipEl.textContent = SERVER.ip;
-  setProgress(20);
-
-  try{
-    const t1 = performance.now();
-    const res = await fetch(SERVER.apiBase + SERVER.ip, {cache:'no-store'});
-    const ping = Math.round(performance.now() - t1);
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    setProgress(60);
-
-    if(data.online){
-      tower.classList.remove('offline');
-      statusEl.textContent = '● ONLINE';
-      statusEl.className = 'screen-status online';
-      const online = data.players?.online ?? 0;
-      const max = data.players?.max ?? '?';
-      playersEl.textContent = `${online} / ${max}`;
-      playersEl.className = 'metric-value online';
-      versionEl.textContent = data.version?.name_clean || data.version?.name || '—';
-      motdEl.textContent = data.motd?.clean || data.motd?.raw || 'Bebra Maximum';
-      pingEl.textContent = `~${ping} ms`;
-      pingEl.className = 'metric-value online';
-      setProgress(100);
-      logToConsole(`Сервер онлайн · ${online} игроков · ${ping}ms`);
-    } else {
-      throw new Error('Server offline');
-    }
-  } catch(err){
-    tower.classList.add('offline');
-    statusEl.textContent = '● OFFLINE';
-    statusEl.className = 'screen-status offline';
-    playersEl.textContent = '— / —';
-    playersEl.className = 'metric-value offline';
-    pingEl.textContent = '—';
-    pingEl.className = 'metric-value offline';
-    versionEl.textContent = '—';
-    motdEl.textContent = 'Сервер временно недоступен';
-    setProgress(0);
-    logToConsole('❌ Не удалось подключиться');
+  /* ---------- ШАПКА ПРИ СКРОЛЛЕ ---------- */
+  var header = document.getElementById('header');
+  function onScroll(){
+    if(window.scrollY > 40){ header.classList.add('scrolled'); }
+    else { header.classList.remove('scrolled'); }
   }
-}
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
 
-function initReveal(){
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if(e.isIntersecting){
-        e.target.classList.add('active');
-        observer.unobserve(e.target);
+  /* ---------- ПОЯВЛЕНИЕ СЕКЦИЙ ---------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    revealEls.forEach(function(el){ el.classList.add('visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var el = entry.target;
+          var delay = parseInt(el.dataset.delay || '0', 10);
+          setTimeout(function(){ el.classList.add('visible'); }, delay);
+          io.unobserve(el);
+        }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -60px 0px'});
+
+    revealEls.forEach(function(el){
+      var parent = el.parentNode;
+      var siblings = parent ? Array.prototype.filter.call(parent.children, function(c){
+        return c.classList && c.classList.contains('reveal');
+      }) : [];
+      var pos = siblings.indexOf(el);
+      if(siblings.length > 1 && pos > -1){
+        el.dataset.delay = String(pos * 80);
       }
+      io.observe(el);
     });
-  }, {threshold:.12});
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-}
+  }
 
-function initHeaderScroll(){
-  const header = document.getElementById('header');
-  window.addEventListener('scroll', () => {
-    header.classList.toggle('scrolled', window.scrollY > 40);
-  });
-}
+  /* ---------- ЧАСТИЦЫ ---------- */
+  var particlesBox = document.getElementById('particles');
+  if(particlesBox && !reduceMotion){
+    var count = window.innerWidth < 768 ? 16 : 30;
+    var frag = document.createDocumentFragment();
+    for(var i = 0; i < count; i++){
+      var p = document.createElement('span');
+      var size = (Math.random() * 5 + 3).toFixed(1);
+      p.className = 'particle';
+      p.style.left = (Math.random() * 100).toFixed(2) + '%';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.animationDuration = (Math.random() * 14 + 9).toFixed(1) + 's';
+      p.style.animationDelay = '-' + (Math.random() * 20).toFixed(1) + 's';
+      p.style.setProperty('--dx', ((Math.random() * 120) - 60).toFixed(0) + 'px');
+      p.style.opacity = (Math.random() * 0.35 + 0.25).toFixed(2);
+      frag.appendChild(p);
+    }
+    particlesBox.appendChild(frag);
+  }
 
-function initSmoothScroll(){
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const id = a.getAttribute('href');
-      if(id === '#' || id.length < 2) return;
-      const target = document.querySelector(id);
-      if(target){
+  /* ---------- КОПИРОВАНИЕ IP ---------- */
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+  var ipCard = document.getElementById('ipCard');
+  var ipValue = document.getElementById('ipValue');
+
+  function showToast(text){
+    toast.textContent = text;
+    toast.classList.add('show');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2000);
+  }
+
+  function legacyCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyIp(){
+    var text = ipValue.textContent.trim();
+    var done = function(ok){
+      if(ok){
+        ipCard.classList.add('copied');
+        showToast('✓ Скопировано!');
+        setTimeout(function(){ ipCard.classList.remove('copied'); }, 1400);
+      } else {
+        showToast('Не удалось скопировать');
+      }
+    };
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){
+        done(legacyCopy(text));
+      });
+    } else {
+      done(legacyCopy(text));
+    }
+  }
+
+  if(ipCard){
+    ipCard.addEventListener('click', copyIp);
+    ipCard.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){
         e.preventDefault();
-        const y = target.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({top:y, behavior:'smooth'});
+        copyIp();
       }
     });
+  }
+
+  /* ---------- МОНИТОРИНГ ОНЛАЙНА ---------- */
+  var API_JAVA    = 'https://api.mcsrvstat.us/3/bebra-maximum.ru';
+  var API_BEDROCK = 'https://api.mcsrvstat.us/bedrock/3/bebra-maximum.ru:19709';
+  var REFRESH_MS  = 60000;
+
+  var elPulse      = document.getElementById('statusPulse');
+  var elHeadline   = document.getElementById('statusHeadline');
+  var elSub        = document.getElementById('statusSub');
+  var elJava       = document.getElementById('statJava');
+  var elPlayers    = document.getElementById('statPlayers');
+  var elPlayersBar = document.getElementById('statPlayersBar');
+  var elBedrock    = document.getElementById('statBedrock');
+  var elUpdated    = document.getElementById('statUpdated');
+  var elMotd       = document.getElementById('statusMotd');
+  var elMotdText   = document.getElementById('statusMotdText');
+  var elBadge      = document.getElementById('heroBadge');
+  var refreshBtn   = document.getElementById('refreshBtn');
+
+  function setStatusTile(el, cls, text){
+    el.className = 'stat-value ' + cls;
+    el.innerHTML = '<span class="stat-dot" aria-hidden="true"></span><span>' + text + '</span>';
+  }
+
+  function setPlainTile(el, cls, html){
+    el.className = 'stat-value ' + cls;
+    el.innerHTML = html;
+  }
+
+  function clockTime(){
+    var d = new Date();
+    return String(d.getHours()).padStart(2,'0') + ':' +
+           String(d.getMinutes()).padStart(2,'0') + ':' +
+           String(d.getSeconds()).padStart(2,'0');
+  }
+
+  function fetchJson(url){
+    return fetch(url, {cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
+  var loading = false;
+
+  function loadStatus(){
+    if(loading) return;
+    loading = true;
+    refreshBtn.classList.add('spinning');
+
+    Promise.allSettled([fetchJson(API_JAVA), fetchJson(API_BEDROCK)])
+      .then(function(results){
+        var java    = results[0].status === 'fulfilled' ? results[0].value : null;
+        var bedrock = results[1].status === 'fulfilled' ? results[1].value : null;
+
+        /* Java */
+        if(java && typeof java.online !== 'undefined'){
+          var javaOnline = !!java.online;
+          setStatusTile(elJava, javaOnline ? 'ok' : 'off', javaOnline ? 'Онлайн' : 'Офлайн');
+
+          var players = (java.players && typeof java.players.online === 'number') ? java.players.online : null;
+          var maxPlayers = (java.players && typeof java.players.max === 'number') ? java.players.max : null;
+
+          if(players !== null && maxPlayers !== null){
+            setPlainTile(elPlayers, '', players + ' <small>/ ' + maxPlayers + '</small>');
+            elPlayersBar.style.width = (maxPlayers > 0 ? Math.min(100, (players / maxPlayers) * 100) : 0) + '%';
+          } else if(players !== null){
+            setPlainTile(elPlayers, '', String(players));
+            elPlayersBar.style.width = '0%';
+          } else {
+            setPlainTile(elPlayers, 'pending', '—');
+          }
+
+          elHeadline.textContent = javaOnline ? 'Сервер онлайн' : 'Сервер офлайн';
+          elSub.textContent = javaOnline
+            ? (players !== null && maxPlayers !== null
+                ? 'Игроков онлайн: ' + players + ' из ' + maxPlayers
+                : 'Сервер bebra-maximum.ru доступен')
+            : 'Сервер bebra-maximum.ru не отвечает';
+          elPulse.className = 'status-pulse ' + (javaOnline ? 'ok' : 'off');
+          elBadge.className = 'badge ' + (javaOnline ? '' : 'is-off');
+
+          var motd = '';
+          if(java.motd && java.motd.clean && java.motd.clean.length){
+            motd = java.motd.clean.filter(function(s){ return s && s.trim(); }).join(' ').trim();
+          }
+          if(motd){
+            elMotdText.textContent = motd;
+            elMotd.hidden = false;
+          } else {
+            elMotd.hidden = true;
+          }
+        } else {
+          setStatusTile(elJava, 'pending', 'Нет данных');
+          setPlainTile(elPlayers, 'pending', '—');
+          elHeadline.textContent = 'Не удалось получить статус';
+          elSub.textContent = 'Сервис проверки недоступен';
+          elPulse.className = 'status-pulse';
+          elBadge.className = 'badge is-unknown';
+          elMotd.hidden = true;
+        }
+
+        /* Bedrock */
+        if(bedrock && typeof bedrock.online !== 'undefined'){
+          var bOnline = !!bedrock.online;
+          setStatusTile(elBedrock, bOnline ? 'ok' : 'off', bOnline ? 'Онлайн' : 'Офлайн');
+        } else {
+          setStatusTile(elBedrock, 'pending', 'Нет данных');
+        }
+
+        setPlainTile(elUpdated, '', clockTime());
+      })
+      .catch(function(){
+        setStatusTile(elJava, 'pending', 'Нет данных');
+        setPlainTile(elPlayers, 'pending', '—');
+        setStatusTile(elBedrock, 'pending', 'Нет данных');
+        setPlainTile(elUpdated, '', clockTime());
+        elHeadline.textContent = 'Не удалось получить статус';
+        elSub.textContent = 'Проверьте подключение к интернету';
+        elPulse.className = 'status-pulse';
+        elBadge.className = 'badge is-unknown';
+      })
+      .then(function(){
+        loading = false;
+        refreshBtn.classList.remove('spinning');
+      });
+  }
+
+  refreshBtn.addEventListener('click', loadStatus);
+
+  /* Запускаем опрос, когда блок статуса появился на экране */
+  var statusSection = document.getElementById('status');
+  var started = false;
+
+  function startPolling(){
+    if(started) return;
+    started = true;
+    loadStatus();
+    setInterval(loadStatus, REFRESH_MS);
+  }
+
+  if('IntersectionObserver' in window){
+    var sio = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ startPolling(); sio.disconnect(); }
+      });
+    }, {threshold:0.15});
+    sio.observe(statusSection);
+  } else {
+    startPolling();
+  }
+
+  /* Бейдж в hero обновляем сразу, не дожидаясь скролла */
+  fetchJson(API_JAVA).then(function(java){
+    if(!java || typeof java.online === 'undefined') return;
+    elBadge.className = 'badge ' + (java.online ? '' : 'is-off');
+  }).catch(function(){
+    elBadge.className = 'badge is-unknown';
   });
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  initReveal();
-  initHeaderScroll();
-  initSmoothScroll();
-  fetchServerStatus();
-  setInterval(fetchServerStatus, 30000);
-  logToConsole('Система Bebra Maximum готова');
-});
+  /* ---------- ПЛАВНЫЙ СКРОЛЛ ДЛЯ ЯКОРЕЙ ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function(link){
+    link.addEventListener('click', function(e){
+      var id = link.getAttribute('href');
+      if(id === '#' || id === '#top'){
+        e.preventDefault();
+        window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
+        return;
+      }
+      var target = document.querySelector(id);
+      if(!target) return;
+      e.preventDefault();
+      var offset = header.offsetHeight + 14;
+      var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({top: top, behavior: reduceMotion ? 'auto' : 'smooth'});
+    });
+  });
+})();
 </script>
-
 </body>
-  </html>
+</html>
