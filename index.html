@@ -1,1501 +1,2224 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BEBRA-MAXIMUM — Minecraft сервер</title>
-<meta name="description" content="BEBRA-MAXIMUM — кросс-платформенный Minecraft сервер. Уютная майнкрафт-деревня, ивенты, квесты и прокачка навыков. Играй с телефона и с ПК.">
-<meta name="theme-color" content="#080b14">
-<link rel="icon" type="image/jpeg" href="logo-square.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BEBRA-MAXIMUM — Minecraft сервер Java и Bedrock</title>
+<meta name="description" content="BEBRA-MAXIMUM — кросс-платформенный Minecraft сервер. Java и Bedrock в одном мире: медные данжи, особые ключи, ивенты и квесты. Без доната и китов.">
+<meta name="theme-color" content="#f2f4f9">
+<link rel="icon" href="logo-square.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BEBRA-MAXIMUM">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://gffrgoogle.github.io/bebra-maximum.ru/">
+<meta property="og:title" content="BEBRA-MAXIMUM — Minecraft сервер">
+<meta property="og:description" content="Ванильный Minecraft, один мир для ПК и телефона. Без доната и китов.">
+<!-- Ссылку на картинку соцсети тянут сами, поэтому адрес нужен полный,
+     а не относительный: с относительным превью просто не появится. -->
+<meta property="og:image" content="https://gffrgoogle.github.io/bebra-maximum.ru/img/builds.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+
 <script>
-/* Фолбэк логотипов: если картинка не загрузилась — показываем стилизованный текст */
-function logoFallback(img){
+/* Тему ставим сразу, до отрисовки — иначе при загрузке мигнёт белым.
+   Если человек ещё не выбирал вручную, берём настройку системы. */
+(function () {
+  var t;
+  try { t = localStorage.getItem('bebra-theme'); } catch (e) { t = null; }
+  if (t !== 'light' && t !== 'dark') {
+    t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  document.documentElement.setAttribute('data-theme', t);
+})();
+
+/* Если картинка с логотипом не загрузилась — показываем просто текст */
+function logoFallback(img) {
   var span = document.createElement('span');
-  span.className = 'logo-fallback' + (img.dataset.fallbackSize ? ' ' + img.dataset.fallbackSize : '');
+  span.className = 'logo-fallback';
   span.textContent = 'BEBRA-MAXIMUM';
   img.parentNode.replaceChild(span, img);
 }
 </script>
+
 <style>
-:root{
-  --blue:#29ABE2;
-  --blue-light:#5cc4f0;
-  --blue-deep:#1b7fb0;
-  --yellow:#FFE500;
-  --yellow-glow:#FFD400;
-  --bg:#080b14;
-  --bg2:#0d1220;
-  --card:rgba(255,255,255,0.04);
-  --card-hover:rgba(255,255,255,0.07);
-  --border:rgba(255,255,255,0.08);
-  --border-strong:rgba(255,255,255,0.14);
-  --border-glow:rgba(41,171,226,0.45);
-  --text:#ffffff;
-  --muted:#8892a6;
-  --green:#4ade80;
-  --red:#ff5252;
-  --radius:20px;
-  --maxw:1280px;
+/* ============================================================
+   Всё в одном файле — так проще править прямо на хостинге.
+   Если распухнет ещё сильнее, вынесу стили отдельно.
+   ============================================================ */
+
+:root {
+  --blue: #29ABE2;
+  --blue-dark: #1b8ec4;
+  --yellow: #FFE500;
+  --yellow-dark: #e6cf00;
+  --green: #3fa34d;
+  --red: #e5484d;
+
+  --bg: #f2f4f9;
+  --bg-soft: #e7ecf5;
+  --card: #ffffff;
+  --line: #dce2ed;
+  --line-soft: #e9edf5;
+  --text: #0f1623;
+  --muted: #5b6880;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --pad: 22px;
+  --maxw: 1160px;
+
+  --shadow: 0 2px 4px rgba(15, 22, 35, .04), 0 14px 30px -16px rgba(15, 22, 35, .22);
+  --font: 'Rubik', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-title: 'Bungee', 'Rubik', sans-serif;
 }
 
-*{margin:0;padding:0;box-sizing:border-box}
-
-html{
-  scroll-behavior:smooth;
-  -webkit-text-size-adjust:100%;
+html[data-theme="dark"] {
+  --bg: #0c1118;
+  --bg-soft: #121a25;
+  --card: #151d28;
+  --line: #25303f;
+  --line-soft: #1d2735;
+  --text: #e9eff8;
+  --muted: #90a0b7;
+  --shadow: 0 2px 4px rgba(0, 0, 0, .32), 0 16px 32px -18px rgba(0, 0, 0, .9);
+  --blue-dark: #57c4ef;
+  --yellow-dark: #ffe94d;
+  --green: #4fbe60;
 }
 
-body{
-  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
-  line-height:1.6;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
 }
 
-body::before{
-  content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
-  background:
-    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(41,171,226,0.20), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 100%, rgba(255,229,0,0.10), transparent 55%),
-    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(41,171,226,0.05), transparent 60%);
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-body::after{
-  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+/* фон в пиксельную клетку — почти незаметно, но оживляет пустоту */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
-  background-size:56px 56px;
-  mask-image:radial-gradient(ellipse 90% 70% at 50% 30%, #000 20%, transparent 85%);
-  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%, #000 20%, transparent 85%);
-}
-
-img{max-width:100%;display:block}
-a{color:inherit;text-decoration:none}
-button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit}
-
-.container{
-  width:100%;
-  max-width:var(--maxw);
-  margin:0 auto;
-  padding:0 24px;
-}
-
-/* ============ ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ============ */
-/* Блок стоит ДО компонентов: у .card:hover и .reveal.visible одинаковая
-   специфичность, поэтому побеждает правило, написанное ниже. Плюс анимация
-   появления идёт через отдельное свойство translate — оно не конфликтует
-   с transform, который использует hover-подъём карточек. */
-
-.reveal{
-  opacity:0;
-  translate:0 30px;
-  transition:opacity .75s cubic-bezier(.2,.7,.3,1), translate .75s cubic-bezier(.2,.7,.3,1);
-}
-.reveal.visible{opacity:1;translate:0 0}
-
-/* ============ ЛОГОТИПЫ ============ */
-
-.logo-fallback{
-  font-family:'Bungee',cursive;
-  color:var(--yellow);
-  letter-spacing:0.02em;
-  line-height:1;
-  white-space:nowrap;
-  -webkit-text-stroke:2.5px #000;
-  paint-order:stroke fill;
-  text-shadow:0 4px 0 rgba(0,0,0,0.55);
-}
-.logo-fallback.lg{font-size:clamp(22px,6vw,44px);-webkit-text-stroke:3px #000}
-.logo-fallback.sm{font-size:15px;-webkit-text-stroke:2px #000}
-
-/* ============ ШАПКА ============ */
-
-.header{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:16px 0;
-  transition:padding .35s ease, background .35s ease, box-shadow .35s ease, backdrop-filter .35s ease, border-color .35s ease;
-  border-bottom:1px solid transparent;
-}
-.header.scrolled{
-  padding:8px 0;
-  background:rgba(8,11,20,0.82);
-  backdrop-filter:blur(18px) saturate(140%);
-  -webkit-backdrop-filter:blur(18px) saturate(140%);
-  border-bottom-color:var(--border);
-  box-shadow:0 10px 34px rgba(0,0,0,0.45);
-}
-.header-inner{
-  display:flex;align-items:center;justify-content:space-between;gap:22px;
-}
-.header-logo{display:flex;align-items:center;flex-shrink:0}
-.header-logo img{
-  height:48px;width:auto;border-radius:9px;
-  transition:height .35s ease;
-  box-shadow:0 6px 18px rgba(41,171,226,0.28);
-}
-.header.scrolled .header-logo img{height:38px}
-
-.nav{display:flex;align-items:center;gap:6px}
-.nav a{
-  position:relative;
-  padding:9px 15px;
-  border-radius:11px;
-  font-size:14.5px;font-weight:600;
-  color:rgba(255,255,255,0.72);
-  transition:color .25s ease, background .25s ease;
-  white-space:nowrap;
-}
-.nav a::after{
-  content:'';position:absolute;left:15px;right:15px;bottom:4px;height:2px;
-  border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--yellow));
-  transform:scaleX(0);transform-origin:left;transition:transform .3s ease;
-}
-.nav a:hover{color:#fff;background:rgba(255,255,255,0.05)}
-.nav a:hover::after{transform:scaleX(1)}
-
-/* ============ КНОПКИ ============ */
-
-.btn{
-  position:relative;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  padding:14px 30px;
-  border-radius:14px;
-  font-size:15px;font-weight:700;letter-spacing:0.01em;
-  overflow:hidden;
-  transition:transform .28s cubic-bezier(.2,.7,.3,1), box-shadow .28s ease, background .28s ease, color .28s ease, border-color .28s ease;
-  white-space:nowrap;
-  text-align:center;
-}
-.btn:active{transform:translateY(-1px) scale(.99)}
-
-.btn-primary{
-  background:linear-gradient(160deg,#FFF45C 0%,var(--yellow) 45%,var(--yellow-glow) 100%);
-  color:#0a0d14;
-  box-shadow:0 6px 20px rgba(255,229,0,0.22), inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -2px 0 rgba(0,0,0,0.14);
-}
-.btn-primary::before{
-  content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,0.65),transparent);
-  transform:skewX(-18deg);
-  transition:left .65s ease;
-}
-.btn-primary:hover{
-  transform:translateY(-3px);
-  box-shadow:0 14px 34px rgba(255,229,0,0.42), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -2px 0 rgba(0,0,0,0.14);
-}
-.btn-primary:hover::before{left:130%}
-
-.btn-discord{
-  background:rgba(255,229,0,0.05);
-  border:2px solid var(--yellow);
-  color:var(--yellow);
-  box-shadow:inset 0 0 0 0 rgba(255,229,0,0);
-}
-.btn-discord:hover{
-  transform:translateY(-3px);
-  background:rgba(255,229,0,0.13);
-  color:#fff;
-  border-color:#fff;
-  box-shadow:0 14px 32px rgba(255,229,0,0.24);
-}
-
-.btn-sm{padding:11px 22px;font-size:14px;border-radius:12px}
-
-/* ============ HERO ============ */
-
-.hero{
-  position:relative;
-  min-height:100vh;
-  min-height:100svh;
-  display:flex;align-items:center;justify-content:center;
-  padding:132px 24px 92px;
-  overflow:hidden;
-}
-.hero-inner{
-  position:relative;z-index:3;
-  width:100%;max-width:900px;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-}
-
-.badge{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:9px 20px 9px 16px;
-  border-radius:100px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid var(--border-strong);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  font-size:13.5px;font-weight:600;letter-spacing:0.02em;
-  color:rgba(255,255,255,0.86);
-  margin-bottom:34px;
-}
-.badge .dot{
-  width:9px;height:9px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 0 0 rgba(74,222,128,0.6);
-  animation:pulse 2s infinite;
-  flex-shrink:0;
-}
-.badge.is-off .dot{background:var(--red);box-shadow:0 0 0 0 rgba(255,82,82,0.6);animation-name:pulseRed}
-.badge.is-unknown .dot{background:var(--muted);animation:none}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(74,222,128,0.6)}
-  70%{box-shadow:0 0 0 11px rgba(74,222,128,0)}
-  100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}
-}
-@keyframes pulseRed{
-  0%{box-shadow:0 0 0 0 rgba(255,82,82,0.6)}
-  70%{box-shadow:0 0 0 11px rgba(255,82,82,0)}
-  100%{box-shadow:0 0 0 0 rgba(255,82,82,0)}
-}
-
-.logo-float{animation:float 6.5s ease-in-out infinite;margin-bottom:38px}
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-16px)}
-}
-
-.logo-ring{
-  position:relative;
-  width:min(340px,74vw);
-  aspect-ratio:1/1;
-  border-radius:36px;
-  overflow:hidden;
-  display:grid;place-items:center;
-  box-shadow:0 30px 70px rgba(0,0,0,0.55), 0 0 70px rgba(41,171,226,0.18);
-}
-.logo-ring::before{
-  content:'';
-  position:absolute;
-  inset:-60%;
-  background:conic-gradient(from 0deg,
-    var(--blue) 0deg,
-    var(--yellow) 90deg,
-    var(--blue) 180deg,
-    var(--yellow) 270deg,
-    var(--blue) 360deg);
-  animation:spin 7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.logo-ring img{
-  position:relative;z-index:2;
-  width:calc(100% - 12px);
-  height:calc(100% - 12px);
-  object-fit:cover;
-  border-radius:29px;
-  background:var(--bg2);
-}
-
-.hero-title{
-  font-family:'Bungee',cursive;
-  font-size:clamp(30px,7vw,58px);
-  line-height:1.06;
-  letter-spacing:0.01em;
-  margin-bottom:22px;
-  background:linear-gradient(180deg,#ffffff 25%,#a9c2dc 100%);
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-
-.hero-sub{
-  font-size:clamp(15px,1.6vw,18px);
-  color:rgba(255,255,255,0.76);
-  max-width:660px;
-  margin:0 auto 34px;
-  line-height:1.72;
-}
-
-/* ============ БЛОК IP ============ */
-
-.ip-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:34px;width:100%}
-
-.ip-card{
-  display:inline-flex;align-items:center;gap:16px;
-  padding:14px 16px 14px 24px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.055);
-  border:1px solid var(--border-strong);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  transition:transform .28s cubic-bezier(.2,.7,.3,1), border-color .28s ease, box-shadow .28s ease, background .28s ease;
-  max-width:100%;
-}
-.ip-card:hover{
-  transform:translateY(-4px);
-  border-color:var(--border-glow);
-  background:rgba(41,171,226,0.09);
-  box-shadow:0 16px 38px rgba(41,171,226,0.24);
-}
-.ip-card.copied{border-color:rgba(74,222,128,0.7);box-shadow:0 16px 38px rgba(74,222,128,0.24)}
-.ip-text{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
-.ip-label{
-  font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:2px;
-}
-.ip-value{
-  font-family:'Bungee',cursive;
-  font-size:clamp(17px,3.4vw,25px);
-  letter-spacing:0.02em;
-  color:#fff;
-  word-break:break-all;
-}
-.ip-copy-icon{
-  flex-shrink:0;
-  width:40px;height:40px;border-radius:12px;
-  display:grid;place-items:center;
-  background:linear-gradient(160deg,var(--blue),var(--blue-deep));
-  color:#fff;
-  transition:transform .28s ease, box-shadow .28s ease;
-}
-.ip-card:hover .ip-copy-icon{transform:scale(1.12);box-shadow:0 8px 22px rgba(41,171,226,0.5)}
-.ip-copy-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-.ip-port{
-  font-size:14px;font-weight:600;
-  color:var(--yellow);
-  letter-spacing:0.01em;
-}
-
-.hero-buttons{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%}
-
-/* ============ ЧАСТИЦЫ ============ */
-
-.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
-.particle{
-  position:absolute;bottom:-24px;
-  border-radius:50%;
-  background:var(--yellow);
-  opacity:0;
-  animation:rise linear infinite;
-  will-change:transform,opacity;
-}
-@keyframes rise{
-  0%{transform:translate3d(0,0,0) scale(.6);opacity:0}
-  12%{opacity:.72}
-  80%{opacity:.42}
-  100%{transform:translate3d(var(--dx,0),-108vh,0) scale(1);opacity:0}
-}
-
-/* ============ СЕКЦИИ ============ */
-
-.section{
-  position:relative;
-  padding:104px 0;
-  scroll-margin-top:78px;
-}
-.section-head{margin-bottom:54px;text-align:center}
-.section-title{
-  font-family:'Bungee',cursive;
-  font-size:clamp(26px,4.6vw,44px);
-  line-height:1.12;
-  letter-spacing:0.015em;
-  text-transform:uppercase;
-  background:linear-gradient(180deg,#ffffff 30%,#9fb4d0 100%);
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-.title-bar{
-  width:76px;height:4px;border-radius:4px;margin:20px auto 0;
-  background:linear-gradient(90deg,var(--blue),var(--yellow));
-  box-shadow:0 0 18px rgba(41,171,226,0.5);
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  /* opacity/translate продублированы из .reveal: правило .card стоит ниже,
-     поэтому его transition перекрывает .reveal — без этого карточки
-     появлялись бы рывком, без плавного проявления. */
-  transition:opacity .75s cubic-bezier(.2,.7,.3,1), translate .75s cubic-bezier(.2,.7,.3,1),
-             transform .35s cubic-bezier(.2,.7,.3,1), background .35s ease,
-             border-color .35s ease, box-shadow .35s ease;
-  will-change:transform;
-}
-.card:hover{
-  transform:translateY(-6px);
-  background:var(--card-hover);
-  border-color:var(--border-glow);
-  box-shadow:0 22px 46px rgba(0,0,0,0.5), 0 0 0 1px rgba(41,171,226,0.12);
-}
-
-/* ============ СТАТУС ============ */
-
-.status-panel{
-  padding:34px;
-  border-radius:26px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.022));
-  border:1px solid var(--border-strong);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  box-shadow:0 26px 60px rgba(0,0,0,0.42);
-}
-.status-top{
-  display:flex;align-items:center;justify-content:space-between;gap:18px;
-  flex-wrap:wrap;margin-bottom:26px;
-}
-.status-top-left{display:flex;align-items:center;gap:14px;min-width:0}
-.status-pulse{
-  width:13px;height:13px;border-radius:50%;flex-shrink:0;
-  background:var(--muted);
-  animation:pulse 2s infinite;
-}
-.status-pulse.ok{background:var(--green)}
-.status-pulse.off{background:var(--red);animation-name:pulseRed}
-.status-headline{display:flex;flex-direction:column;min-width:0}
-.status-headline b{
-  font-family:'Bungee',cursive;font-size:19px;letter-spacing:0.02em;color:#fff;
-}
-.status-headline span{font-size:13px;color:var(--muted)}
-
-.refresh-btn{
-  display:inline-flex;align-items:center;gap:9px;
-  padding:10px 20px;border-radius:12px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid var(--border-strong);
-  color:rgba(255,255,255,0.85);
-  font-size:13.5px;font-weight:600;
-  transition:transform .28s ease, background .28s ease, border-color .28s ease, box-shadow .28s ease, color .28s ease;
-}
-.refresh-btn:hover{
-  transform:translateY(-3px);
-  background:rgba(41,171,226,0.14);
-  border-color:var(--border-glow);
-  color:#fff;
-  box-shadow:0 12px 28px rgba(41,171,226,0.26);
-}
-.refresh-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.refresh-btn.spinning svg{animation:spin 1s linear infinite}
-
-.status-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:16px;
-}
-.stat{
-  padding:20px 22px;
-  border-radius:16px;
-  background:rgba(255,255,255,0.035);
-  border:1px solid var(--border);
-  transition:transform .3s cubic-bezier(.2,.7,.3,1), background .3s ease, border-color .3s ease, box-shadow .3s ease;
-}
-.stat:hover{
-  transform:translateY(-6px);
-  background:rgba(255,255,255,0.065);
-  border-color:var(--border-glow);
-  box-shadow:0 18px 36px rgba(0,0,0,0.4);
-}
-.stat-label{
-  font-size:11px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:10px;
-}
-.stat-value{
-  font-family:'Bungee',cursive;
-  font-size:clamp(19px,2.6vw,26px);
-  line-height:1.1;
-  color:#fff;
-  display:flex;align-items:center;gap:9px;
-  word-break:break-word;
-}
-.stat-value.ok{color:var(--green)}
-.stat-value.off{color:var(--red)}
-.stat-value.pending{color:var(--muted)}
-.stat-value small{font-size:0.62em;color:var(--muted);font-family:'Inter',sans-serif;font-weight:600}
-.stat-dot{width:10px;height:10px;border-radius:50%;background:currentColor;flex-shrink:0}
-.stat-bar{
-  margin-top:12px;height:5px;border-radius:5px;
-  background:rgba(255,255,255,0.09);overflow:hidden;
-}
-.stat-bar i{
-  display:block;height:100%;width:0;border-radius:5px;
-  background:linear-gradient(90deg,var(--blue),var(--yellow));
-  transition:width .8s cubic-bezier(.2,.7,.3,1);
-}
-
-.status-motd{
-  margin-top:20px;padding:16px 20px;
-  border-radius:14px;
-  background:rgba(41,171,226,0.07);
-  border:1px solid rgba(41,171,226,0.2);
-  font-size:14px;color:rgba(255,255,255,0.8);
-  display:flex;gap:12px;align-items:flex-start;
-}
-.status-motd b{
-  flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:0.13em;
-  text-transform:uppercase;color:var(--blue-light);padding-top:3px;
-}
-.status-note{
-  margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center;
-}
-.status-note a{color:var(--blue-light);border-bottom:1px solid rgba(41,171,226,0.4)}
-.status-note a:hover{color:var(--yellow);border-bottom-color:rgba(255,229,0,0.5)}
-
-/* ============ О СЕРВЕРЕ ============ */
-
-.about-panel{
-  padding:44px clamp(24px,4vw,54px);
-  border-radius:26px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  border:1px solid var(--border);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  box-shadow:0 26px 60px rgba(0,0,0,0.36);
-}
-.about-panel p{
-  font-size:clamp(15px,1.55vw,17.5px);
-  color:rgba(255,255,255,0.8);
-  line-height:1.85;
-  max-width:820px;margin:0 auto 20px;
-  text-align:center;
-}
-.about-panel p:last-of-type{margin-bottom:0}
-.quote{
-  position:relative;
-  margin:34px auto 0;
-  max-width:700px;
-  padding:24px 30px;
-  border-radius:18px;
-  background:rgba(255,229,0,0.06);
-  border:1px solid rgba(255,229,0,0.22);
-  font-size:clamp(15px,1.7vw,18.5px);
-  font-weight:600;
-  font-style:italic;
-  color:var(--yellow);
-  text-align:center;
-  line-height:1.6;
-}
-
-/* ============ НАПРАВЛЕНИЯ ============ */
-
-.features-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
-}
-.feature{
-  padding:32px 28px;
-  display:flex;flex-direction:column;
-}
-.feature-icon{
-  width:60px;height:60px;border-radius:17px;
-  display:grid;place-items:center;
-  font-size:28px;line-height:1;
-  background:linear-gradient(160deg, rgba(41,171,226,0.22), rgba(255,229,0,0.12));
-  border:1px solid rgba(255,255,255,0.1);
-  margin-bottom:20px;
-  transition:transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease;
-}
-.feature:hover .feature-icon{
-  transform:scale(1.14) rotate(-4deg);
-  box-shadow:0 12px 28px rgba(41,171,226,0.3);
-}
-.feature h3{
-  font-family:'Bungee',cursive;
-  font-size:17px;line-height:1.25;letter-spacing:0.015em;
-  color:#fff;margin-bottom:11px;
-}
-.feature p{
-  font-size:14.5px;line-height:1.7;color:var(--muted);
-}
-
-/* ============ КАК ИГРАТЬ ============ */
-
-.steps-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:22px;
-}
-.step{
-  position:relative;
-  padding:34px 26px 30px;
-  overflow:hidden;
-}
-.step-num{
-  font-family:'Bungee',cursive;
-  font-size:44px;line-height:1;
-  background:linear-gradient(160deg,var(--blue),var(--yellow));
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-  margin-bottom:16px;
-  transition:transform .35s cubic-bezier(.2,.7,.3,1);
-  display:block;
-}
-.step:hover .step-num{transform:scale(1.14) translateX(4px)}
-.step h3{
-  font-family:'Bungee',cursive;
-  font-size:16px;line-height:1.28;letter-spacing:0.015em;
-  color:#fff;margin-bottom:10px;
-}
-.step p{font-size:14.5px;line-height:1.7;color:var(--muted)}
-.step::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--blue),var(--yellow));
-  transform:scaleX(0);transform-origin:left;
-  transition:transform .45s cubic-bezier(.2,.7,.3,1);
-}
-.step:hover::after{transform:scaleX(1)}
-
-/* ============ СОЦСЕТИ ============ */
-
-.socials-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:22px;
-}
-.social{
-  padding:30px 26px;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:8px;
-}
-.social-icon{
-  font-size:32px;line-height:1;
-  margin-bottom:8px;
-  transition:transform .35s cubic-bezier(.2,.7,.3,1);
-}
-.social:hover .social-icon{transform:scale(1.2) translateY(-3px)}
-.social h3{
-  font-family:'Bungee',cursive;
-  font-size:16px;letter-spacing:0.02em;color:#fff;
-}
-.social span{
-  font-size:13.5px;color:var(--blue-light);font-weight:600;
-  word-break:break-all;
-}
-.social-arrow{
-  margin-top:8px;font-size:13px;font-weight:700;letter-spacing:0.08em;
-  text-transform:uppercase;color:var(--muted);
-  transition:color .3s ease, transform .3s ease;
-}
-.social:hover .social-arrow{color:var(--yellow);transform:translateX(4px)}
-
-/* ============ ФУТЕР ============ */
-
-.footer{
-  position:relative;
-  margin-top:40px;
-  padding:56px 0 30px;
-  border-top:1px solid var(--border);
-  background:linear-gradient(180deg, rgba(255,255,255,0.022), transparent);
-}
-.footer-grid{
-  display:grid;
-  grid-template-columns:1.4fr 1fr 1fr;
-  gap:44px;
-  align-items:start;
-}
-.footer-brand img{
-  height:42px;width:auto;border-radius:8px;margin-bottom:16px;
-  box-shadow:0 6px 18px rgba(41,171,226,0.24);
-}
-.footer-brand p{
-  font-size:14px;line-height:1.72;color:var(--muted);max-width:340px;
-}
-.footer-col h4{
-  font-family:'Bungee',cursive;
-  font-size:13px;letter-spacing:0.09em;text-transform:uppercase;
-  color:#fff;margin-bottom:16px;
-}
-.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
-.footer-col a{
-  font-size:14.5px;color:var(--muted);
-  transition:color .25s ease, transform .25s ease;
-  display:inline-block;
-}
-.footer-col a:hover{color:var(--yellow);transform:translateX(4px)}
-.footer-bottom{
-  margin-top:44px;padding-top:24px;
-  border-top:1px solid var(--border);
-  text-align:center;
-  font-size:13.5px;color:var(--muted);
-}
-
-/* ============ ТОСТ ============ */
-
-.toast{
-  position:fixed;left:50%;bottom:34px;z-index:999;
-  transform:translate(-50%,90px);
-  opacity:0;pointer-events:none;
-  display:inline-flex;align-items:center;gap:10px;
-  padding:14px 26px;
-  border-radius:100px;
-  background:linear-gradient(160deg,#FFF45C,var(--yellow-glow));
-  color:#0a0d14;
-  font-size:15px;font-weight:800;
-  box-shadow:0 18px 44px rgba(255,229,0,0.34);
-  transition:transform .38s cubic-bezier(.2,.7,.3,1), opacity .38s ease;
-}
-.toast.show{transform:translate(-50%,0);opacity:1}
-
-/* ============ ПЛАНШЕТЫ ============ */
-
-@media (max-width:1080px){
-  .features-grid{grid-template-columns:repeat(2,1fr)}
-  .steps-grid{grid-template-columns:repeat(2,1fr)}
-  .socials-grid{grid-template-columns:repeat(2,1fr)}
-  .status-grid{grid-template-columns:repeat(2,1fr)}
-}
-
-@media (max-width:980px){
-  .nav a{padding:8px 11px;font-size:13.5px}
-  .header-logo img{height:42px}
-  .section{padding:84px 0}
-}
-
-/* ============ НИЗКИЕ ЭКРАНЫ (ноутбуки, ~950px и меньше) ============
-   Полный блок hero (бейдж → логотип → текст → IP → кнопки) должен
-   помещаться в первый экран, иначе кнопки уезжают под сгиб. */
-
-@media (min-width:769px) and (max-height:980px){
-  .hero{padding:100px 24px 48px}
-  .badge{margin-bottom:22px}
-  .logo-float{margin-bottom:22px}
-  .logo-ring{width:min(290px,30vh)}
-  .hero-title{margin-bottom:14px}
-  .hero-sub{margin-bottom:22px}
-  .ip-wrap{margin-bottom:22px}
-}
-
-/* Совсем низкие окна (1280x720, 1024x600) — ужимаем сильнее */
-@media (min-width:769px) and (max-height:820px){
-  .hero{padding:84px 24px 32px}
-  .badge{margin-bottom:14px;padding:7px 16px 7px 13px;font-size:12.5px}
-  .logo-float{margin-bottom:14px}
-  .logo-ring{width:min(200px,23vh);border-radius:26px}
-  .logo-ring img{border-radius:20px}
-  .hero-title{font-size:clamp(24px,3.4vw,38px);margin-bottom:10px}
-  .hero-sub{font-size:14.5px;line-height:1.58;margin-bottom:16px}
-  .ip-card{padding:10px 13px 10px 18px}
-  .ip-value{font-size:18px}
-  .ip-wrap{margin-bottom:16px;gap:9px}
-  .hero-buttons .btn{padding:12px 26px;font-size:14.5px}
-}
-
-/* ============ МОБИЛЬНЫЕ ============ */
-
-@media (max-width:768px){
-  .nav{display:none}
-
-  .header{padding:12px 0}
-  .header.scrolled{padding:7px 0}
-  .header-logo img{height:36px}
-  .header.scrolled .header-logo img{height:32px}
-  .header-inner{gap:12px}
-  .btn-sm{padding:10px 18px;font-size:13.5px}
-
-  .container{padding:0 18px}
-
-  .hero{padding:110px 18px 70px;min-height:auto}
-  .badge{font-size:12.5px;padding:8px 16px 8px 13px;margin-bottom:26px}
-  .logo-float{margin-bottom:28px}
-  .logo-ring{width:min(260px,72vw);border-radius:30px}
-  .logo-ring img{border-radius:24px}
-  .hero-title{font-size:clamp(26px,8.6vw,38px);margin-bottom:16px}
-  .hero-sub{font-size:14.5px;line-height:1.68;margin-bottom:26px}
-
-  .ip-wrap{margin-bottom:26px}
-  .ip-card{padding:12px 13px 12px 18px;gap:12px;width:100%;justify-content:space-between}
-  .ip-value{font-size:16px}
-  .ip-copy-icon{width:36px;height:36px;border-radius:10px}
-  .ip-copy-icon svg{width:17px;height:17px}
-
-  .hero-buttons{flex-direction:column;gap:12px}
-  .hero-buttons .btn{width:100%}
-
-  .section{padding:66px 0;scroll-margin-top:64px}
-  .section-head{margin-bottom:36px}
-  .section-title{font-size:clamp(22px,7vw,30px)}
-  .title-bar{width:60px;margin-top:16px}
-
-  .status-panel{padding:22px 18px;border-radius:20px}
-  .status-top{margin-bottom:20px}
-  .status-headline b{font-size:16px}
-  .status-grid{grid-template-columns:repeat(2,1fr);gap:12px}
-  .stat{padding:16px 15px}
-  .stat-label{font-size:10px;letter-spacing:0.1em;margin-bottom:8px}
-  .stat-value{font-size:17px;gap:7px}
-  .status-motd{padding:14px 16px;flex-direction:column;gap:6px;font-size:13.5px}
-
-  .about-panel{padding:28px 20px;border-radius:20px}
-  .about-panel p{font-size:14.5px;line-height:1.78;margin-bottom:16px}
-  .quote{padding:18px 20px;font-size:15px;margin-top:24px}
-
-  .features-grid,.steps-grid,.socials-grid{grid-template-columns:1fr;gap:16px}
-  .feature{padding:26px 22px}
-  .feature-icon{width:54px;height:54px;font-size:25px;margin-bottom:16px}
-  .feature h3{font-size:16px}
-  .step{padding:28px 22px 26px}
-  .step-num{font-size:38px;margin-bottom:12px}
-  .social{padding:26px 22px}
-
-  .footer{padding:44px 0 26px}
-  .footer-grid{grid-template-columns:1fr;gap:32px}
-  .footer-brand p{max-width:none}
-  .footer-bottom{margin-top:32px;font-size:12.5px}
-
-  .toast{bottom:22px;padding:12px 20px;font-size:14px;width:calc(100% - 36px);justify-content:center}
-}
-
-@media (max-width:380px){
-  .header-logo img{height:32px}
-  .btn-sm{padding:9px 14px;font-size:12.5px}
-  .stat-value{font-size:15px}
-}
-
-/* ============ ДОСТУПНОСТЬ ============ */
-
-:focus-visible{
-  outline:2px solid var(--yellow);
-  outline-offset:3px;
-  border-radius:6px;
-}
-
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *,*::before,*::after{
-    animation-duration:.001ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:.001ms !important;
+    linear-gradient(rgba(41, 171, 226, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41, 171, 226, .05) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(ellipse 120% 70% at 50% 0%, #000 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 120% 70% at 50% 0%, #000 20%, transparent 80%);
+}
+
+::selection { background: var(--blue); color: #fff; }
+
+img { max-width: 100%; display: block; }
+
+a { color: var(--blue-dark); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1, h2, h3 { line-height: 1.14; margin: 0; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  position: relative;
+  z-index: 1;
+}
+
+.sr {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ================= появление при скролле =================
+   Двигаем через translate, а не transform: transform занят hover'ом
+   карточек, и если писать туда же — подъём при наведении пропадает.
+   Стоит ВЫШЕ компонентов, иначе перебьёт их transition.
+   ---------------------------------------------------------- */
+
+.rv {
+  opacity: 0;
+  translate: 0 18px;
+  transition: opacity .6s ease, translate .6s ease;
+}
+.rv.in { opacity: 1; translate: 0 0; }
+
+/* ================= шапка ================= */
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+
+.head .wrap {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 68px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--font-title);
+  font-size: 17px;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.brand:hover { text-decoration: none; }
+
+.brand img {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
+  border: 2px solid var(--line);
+}
+
+.logo-fallback {
+  font-family: var(--font-title);
+  color: var(--blue);
+  letter-spacing: .5px;
+}
+
+.menu {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.menu a {
+  color: var(--muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 9px;
+  text-decoration: none;
+  transition: color .18s, background .18s;
+}
+.menu a:hover { color: var(--text); background: var(--bg-soft); text-decoration: none; }
+
+.tgl {
+  margin-left: 8px;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 11px;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color .18s, color .18s, transform .18s;
+}
+.tgl:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-1px); }
+.tgl svg { width: 19px; height: 19px; }
+.tgl .i-sun { display: none; }
+html[data-theme="dark"] .tgl .i-sun { display: block; }
+html[data-theme="dark"] .tgl .i-moon { display: none; }
+
+/* ================= первый экран ================= */
+
+.hero {
+  position: relative;
+  padding: 46px 0 0;
+  overflow: hidden;
+}
+
+.hero .wrap { max-width: 960px; text-align: center; }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 15px 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #9aa7bd;
+  flex: none;
+}
+.dot.on { background: var(--green); box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 22%, transparent); }
+.dot.off { background: var(--red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 20%, transparent); }
+
+.hero h1 {
+  font-family: var(--font-title);
+  font-size: clamp(38px, 8.4vw, 78px);
+  letter-spacing: .5px;
+  margin: 0 0 18px;
+}
+
+.hero h1 .b { color: var(--blue); }
+.hero h1 .y { color: var(--yellow); text-shadow: 0 2px 0 var(--yellow-dark); }
+html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
+
+.lead {
+  font-size: clamp(16px, 2.2vw, 18.5px);
+  color: var(--muted);
+  max-width: 640px;
+  margin: 0 auto 22px;
+}
+
+/* блок с адресом сервера */
+.ipbar {
+  display: flex;
+  align-items: stretch;
+  max-width: 520px;
+  margin: 0 auto 18px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.ipbar .val {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 18px;
+  text-align: left;
+  min-width: 0;
+}
+
+.ipbar .lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.ipbar .addr {
+  font-family: var(--font-title);
+  font-size: clamp(16px, 3.4vw, 21px);
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ipbar button {
+  flex: none;
+  border: 0;
+  border-left: 2px solid var(--line);
+  background: var(--blue);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 0 22px;
+  cursor: pointer;
+  transition: background .18s;
+}
+.ipbar button:hover { background: var(--blue-dark); }
+
+.hint {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+.hint b { color: var(--text); font-weight: 700; }
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
+}
+.btn:hover { text-decoration: none; transform: translateY(-2px); }
+.btn svg { width: 17px; height: 17px; }
+
+.btn-blue {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 10px 22px -12px rgba(41, 171, 226, .95);
+}
+.btn-blue:hover { background: var(--blue-dark); }
+
+.btn-ghost {
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--text);
+}
+.btn-ghost:hover { border-color: var(--blue); }
+
+/* ================= 3D-сцена =================
+   Собран из обычных div'ов: блок — пять граней (низ не видно).
+   По умолчанию сцена стоит на месте. Курсор зашёл на неё — наклоняется
+   вслед за ним, ушёл — плавно возвращается в исходное положение.
+   ---------------------------------------------------------- */
+
+.island {
+  --s: 26px;
+  position: relative;
+  height: 320px;
+  margin-top: 8px;
+  perspective: 1500px;
+  perspective-origin: 50% 40%;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.island .shadow {
+  position: absolute;
+  left: 50%; top: 62%;
+  width: 330px; height: 110px;
+  margin: -55px 0 0 -165px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(15, 22, 35, .26), transparent 70%);
+  filter: blur(6px);
+}
+html[data-theme="dark"] .island .shadow {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, .62), transparent 70%);
+}
+
+.world {
+  --rx: -44deg;
+  --ry: -24deg;
+  --zoom: 1.12;
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 0; height: 0;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--zoom));
+  /* это и есть возврат в исходное положение, когда курсор ушёл */
+  transition: transform .6s cubic-bezier(.22, .7, .3, 1);
+}
+
+/* пока курсор внутри — ведём без задержки, иначе сцена отстаёт */
+.world.tracking {
+  transition-duration: .1s;
+  transition-timing-function: linear;
+}
+
+.spin {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+/* один воксель */
+.vx {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  transform-style: preserve-3d;
+}
+
+/* Грань — это картинка 16x16 пикселей, которую скрипт собирает в SVG.
+   Никаких файлов с текстурами: они рисуются кодом и лежат в переменных. */
+.vx i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-color: var(--side, #7d5731);
+  background-image: var(--tex-side, none);
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+}
+
+/* Затенение по сторонам, как в игре: верх светлее, бока темнее.
+   Через отдельный слой, а не filter — filter ломает 3D-контекст. */
+.vx i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, var(--shade, 0));
+}
+
+/* Грани подписаны t/n/s/e/w (верх, север, юг, восток, запад).
+   Именно так, а не f/b/r/l: односимвольные .f и .b уже заняты
+   карточками и подкраской заголовка — стили бы налезли на кубы. */
+.vx i.t { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); background-image: var(--tex-top, none); --shade: 0; }
+.vx i.n { transform: translateZ(calc(var(--s) / 2)); --shade: .13; }
+.vx i.s { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); --shade: .13; }
+.vx i.e { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); --shade: .29; }
+.vx i.w { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); --shade: .29; }
+
+/* Каждому блоку — своя текстура сверху и сбоку */
+.vx.grass  { --side: #7d5731; --tex-top: var(--t-grasstop);  --tex-side: var(--t-grassside); }
+.vx.dirt   { --side: #7d5731; --tex-top: var(--t-dirt);      --tex-side: var(--t-dirt); }
+.vx.stone  { --side: #7e7e7e; --tex-top: var(--t-stone);     --tex-side: var(--t-stone); }
+.vx.cobble { --side: #8a8a8a; --tex-top: var(--t-cobble);    --tex-side: var(--t-cobble); }
+.vx.log    { --side: #6b4f2a; --tex-top: var(--t-logtop);    --tex-side: var(--t-logside); }
+/* просветы в листве должны читаться как тень, иначе крона сливается с травой */
+.vx.leaves { --side: #123708; --tex-top: var(--t-leaves);    --tex-side: var(--t-leaves); }
+.vx.water  { --side: #3f93d4; --tex-top: var(--t-water);     --tex-side: var(--t-water); }
+.vx.sand   { --side: #ded3a5; --tex-top: var(--t-sand);      --tex-side: var(--t-sand); }
+.vx.copper { --side: #7e7e7e; --tex-top: var(--t-copper);    --tex-side: var(--t-copper); }
+
+/* блоки, которые висят в воздухе и покачиваются */
+.fl { position: absolute; transform-style: preserve-3d; }
+.fl .bob {
+  position: absolute;
+  transform-style: preserve-3d;
+  animation: bob 4.2s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(-22px); }
+  50%      { transform: translateY(-62px); }
+}
+
+/* ================= секции ================= */
+
+.sec { padding: 78px 0; }
+
+.sec-head { margin-bottom: 36px; }
+
+.eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+
+.sec-head h2 {
+  font-family: var(--font-title);
+  font-size: clamp(24px, 4.4vw, 34px);
+  margin-bottom: 12px;
+}
+
+.sec-head h2::after {
+  content: '';
+  display: block;
+  width: 58px;
+  height: 5px;
+  border-radius: 3px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, var(--blue) 0 60%, var(--yellow) 60% 100%);
+}
+
+.sec-head p {
+  color: var(--muted);
+  margin: 0;
+  max-width: 660px;
+  font-size: 15.5px;
+}
+
+/* ================= живые данные ================= */
+
+.live-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.pill.live { color: var(--green); border-color: color-mix(in srgb, var(--green) 40%, var(--line)); }
+.pill.live::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: blink 1.6s ease-in-out infinite;
+}
+.pill.poll { color: var(--yellow-dark); }
+.pill.dead { color: var(--red); }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .25; }
+}
+
+.stamp {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.total .num {
+  font-family: var(--font-title);
+  font-size: clamp(46px, 11vw, 78px);
+  line-height: 1;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.total .cap { color: var(--muted); font-size: 15px; }
+
+/* Рекорд онлайна. Считает его бэкенд, страница только показывает число
+   и никогда не уменьшает — см. showPeak() в скрипте. */
+.total .peak { color: var(--muted); font-size: 15px; }
+.total .peak b { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  margin-top: 26px;
+}
+
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s, box-shadow .2s, opacity .5s ease, translate .5s ease;
+}
+
+/* уголок в цвет платформы — мелкая деталь, но оживляет карточку */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 74px; height: 74px;
+  background: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent, var(--blue)) 16%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.card.java { --accent: var(--blue); }
+.card.bedrock { --accent: var(--green); }
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent, var(--blue)) 45%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.card-top h3 { font-size: 16.5px; font-weight: 700; letter-spacing: .2px; }
+
+.badge {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+.badge.ok { color: var(--green); border-color: color-mix(in srgb, var(--green) 40%, var(--line)); }
+.badge.no { color: var(--red); border-color: color-mix(in srgb, var(--red) 40%, var(--line)); }
+
+.kv {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 9px 14px;
+  font-size: 14.5px;
+  margin: 0;
+}
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue), var(--yellow));
+  transition: width .5s cubic-bezier(.22, .7, .3, 1);
+}
+
+.chart {
+  margin-top: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px 12px;
+}
+
+.chart-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.chart-head h3 { font-size: 15.5px; }
+.chart-head span { margin-left: auto; font-size: 13px; color: var(--muted); }
+
+.chart svg { width: 100%; height: 100px; display: block; overflow: visible; }
+
+/* ================= галерея ================= */
+
+.gal {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.shot {
+  position: relative;
+  margin: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  cursor: zoom-in;
+  transition: transform .25s, border-color .25s, box-shadow .25s, opacity .5s ease, translate .5s ease;
+}
+
+.shot:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .6s cubic-bezier(.2, .7, .3, 1);
+}
+.shot:hover img { transform: scale(1.045); }
+
+.shot figcaption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 34px 16px 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(6, 12, 20, .82));
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .5);
+}
+
+.shot.w4 { grid-column: span 4; aspect-ratio: 16 / 10; }
+.shot.w2 { grid-column: span 2; aspect-ratio: 16 / 10; }
+.shot.w3 { grid-column: span 3; aspect-ratio: 4 / 3; }
+.shot.w6 { grid-column: span 6; aspect-ratio: 21 / 6; }
+
+/* просмотр фото во весь экран */
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  place-items: center;
+  padding: 26px;
+  background: rgba(6, 10, 16, .9);
+  backdrop-filter: blur(4px);
+  cursor: zoom-out;
+}
+.lb.open { display: grid; }
+.lb img {
+  max-width: 100%;
+  max-height: 88vh;
+  border-radius: 12px;
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .8);
+}
+.lb p {
+  position: absolute;
+  bottom: 18px; left: 0; right: 0;
+  text-align: center;
+  color: #cfd8e6;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ================= карточки-фичи ================= */
+
+.feat {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+}
+
+.f {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px 22px;
+  transition: transform .2s, border-color .2s, box-shadow .2s, opacity .5s ease, translate .5s ease;
+}
+
+.f:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.f .ic {
+  width: 46px; height: 46px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  color: var(--blue);
+  margin-bottom: 15px;
+}
+.f .ic svg { width: 23px; height: 23px; }
+
+.f h3 { font-size: 16.5px; margin-bottom: 8px; }
+.f p { margin: 0; color: var(--muted); font-size: 14.8px; }
+
+/* ================= о сервере ================= */
+
+.about {
+  max-width: 720px;
+}
+
+.about p { margin: 0 0 16px; color: var(--muted); }
+.about p:last-child { margin-bottom: 0; }
+.about b { color: var(--text); }
+
+/* ================= подключение ================= */
+
+.steps {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  counter-reset: s;
+}
+
+.st {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px 22px 22px;
+  transition: transform .2s, border-color .2s, box-shadow .2s, opacity .5s ease, translate .5s ease;
+}
+
+.st:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.st::before {
+  counter-increment: s;
+  content: counter(s);
+  position: absolute;
+  top: -14px;
+  left: 20px;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: 9px;
+  background: var(--blue);
+  color: #fff;
+  font-family: var(--font-title);
+  font-size: 14px;
+}
+
+.st h3 { font-size: 16px; margin-bottom: 8px; }
+.st p { margin: 0; color: var(--muted); font-size: 14.6px; }
+
+code {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: .92em;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: var(--text);
+}
+
+.ports {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 22px;
+}
+
+.port {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.port .pl {
+  font-family: var(--font-title);
+  font-size: 15px;
+  color: var(--blue);
+  flex: none;
+}
+.port .pn {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+/* ================= соцсети ================= */
+
+.socs {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+}
+
+.soc {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px 19px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform .2s, border-color .2s, box-shadow .2s, opacity .5s ease, translate .5s ease;
+}
+.soc:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow); }
+
+.soc .mk {
+  width: 42px; height: 42px;
+  flex: none;
+  display: grid; place-items: center;
+  border-radius: 11px;
+  font-family: var(--font-title);
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: .5px;
+}
+.soc.vk .mk { background: #0077FF; }
+.soc.tg .mk { background: #2AABEE; }
+.soc.ds .mk { background: #5865F2; }
+
+.soc small {
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.soc .go {
+  margin-left: auto;
+  flex: none;
+  color: var(--muted);
+  transition: color .2s, transform .2s;
+}
+.soc .go svg { width: 16px; height: 16px; display: block; }
+.soc:hover .go { color: var(--blue); transform: translateX(3px); }
+
+/* ================= футер ================= */
+
+.foot {
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  padding: 34px 0 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.foot .wrap {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.foot .r { margin-left: auto; text-align: right; }
+.foot b { color: var(--text); }
+
+/* ================= тост ================= */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 22px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  z-index: 90;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ================= адаптив ================= */
+
+@media (max-width: 980px) {
+  .about { grid-template-columns: 1fr; }
+  .shot.w4, .shot.w2 { grid-column: span 3; }
+  .shot.w6 { grid-column: span 6; }
+}
+
+@media (max-width: 860px) {
+  .menu a { display: none; }
+  .menu .keep { display: inline-flex; }
+  .hero { padding: 44px 0 0; }
+  .sec { padding: 58px 0; }
+  .stamp { margin-left: 0; width: 100%; }
+  .island { height: 300px; }
+  .world { --zoom: 1.05; }
+}
+
+@media (max-width: 620px) {
+  :root { --pad: 16px; }
+  .ipbar { flex-direction: column; }
+  .ipbar button {
+    border-left: 0;
+    border-top: 2px solid var(--line);
+    padding: 13px 18px;
   }
-  .reveal{opacity:1;translate:0 0}
+  .ipbar .val { text-align: center; }
+  .total .num { font-size: 52px; }
+  .foot .r { margin-left: 0; text-align: left; }
+  .gal { grid-template-columns: 1fr; }
+  .shot.w4, .shot.w2, .shot.w3, .shot.w6 {
+    grid-column: span 1;
+    aspect-ratio: 16 / 10;
+  }
+  .island { height: 260px; }
 }
+
+/* на низких ноутбуках первый экран не должен уезжать за границу */
+@media (max-height: 780px) and (min-width: 861px) {
+  .hero { padding: 38px 0 0; }
+  .hero h1 { font-size: clamp(34px, 5.6vw, 60px); }
+  .lead { margin-bottom: 22px; }
+  .hint { margin-bottom: 20px; }
+  .island { height: 330px; }
+}
+
+/* Кому анимации мешают — отключаем всё лишнее.
+   Мигающий курсор и тост оставляем, они не раздражают. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fl .bob { animation: none; }
+  .world { transition: none; }
+  .rv { opacity: 1; translate: none; transition: none; }
+  .card, .f, .st, .soc, .btn, .tgl, .shot { transition: none; }
+  .pill.live::before { animation: none; }
+  .shot:hover img { transform: none; }
+}
+
+/* ============================================================
+   Заготовка: пробовал тёмную шапку отдельным блоком, не зашло.
+   Оставляю, вдруг вернусь.
+   ------------------------------------------------------------
+.head.dark { background: #0f1623; }
+.head.dark .menu a { color: #b6c2d6; }
+   ============================================================ */
 </style>
 </head>
+
 <body>
 
-<!-- ============ ШАПКА ============ -->
-<header class="header" id="header">
-  <div class="container header-inner">
-    <a class="header-logo" href="#top" aria-label="BEBRA-MAXIMUM — на главную">
-      <img src="logo-banner.jpg" alt="BEBRA-MAXIMUM" data-fallback-size="sm" onerror="logoFallback(this)">
+<!-- ================= шапка ================= -->
+<header class="head">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <img src="logo-square.jpg" alt="Логотип BEBRA-MAXIMUM" onerror="logoFallback(this)">
+      <span>BEBRA-MAXIMUM</span>
     </a>
 
-    <nav class="nav" aria-label="Основная навигация">
+    <nav class="menu" aria-label="Основная навигация">
+      <a href="#live">Онлайн</a>
+      <a href="#gallery">Фото</a>
       <a href="#about">О сервере</a>
-      <a href="#features">Особенности</a>
-      <a href="#how">Как играть</a>
-      <a href="#socials">Контакты</a>
+      <a href="#connect">Как зайти</a>
+      <a class="keep" href="#socials">Связь</a>
+      <button class="tgl" id="tgl" type="button" aria-label="Переключить тему">
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a7.4 7.4 0 1 0 10.8 10.8z"/>
+        </svg>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </svg>
+      </button>
     </nav>
-
-    <a class="btn btn-primary btn-sm" href="#how">Играть</a>
   </div>
 </header>
 
-<main id="top">
-
-<!-- ============ HERO ============ -->
-<section class="hero" id="hero">
-  <div class="particles" id="particles" aria-hidden="true"></div>
-
-  <div class="hero-inner">
-    <div class="badge" id="heroBadge">
-      <span class="dot" aria-hidden="true"></span>
-      Сервер онлайн · Кросс-платформа
+<!-- ================= первый экран ================= -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="tag">
+      <span class="dot" id="heroDot"></span>
+      <span id="heroState">Проверяю, как дела на сервере…</span>
     </div>
 
-    <div class="logo-float">
-      <div class="logo-ring">
-        <img src="logo-square.jpg" alt="Логотип BEBRA-MAXIMUM" data-fallback-size="lg" onerror="logoFallback(this)">
-      </div>
-    </div>
+    <h1><span class="b">BEBRA</span>-<span class="y">MAXIMUM</span></h1>
 
-    <h1 class="hero-title">BEBRA-MAXIMUM</h1>
-
-    <p class="hero-sub">
-      ❤️ Салам, джигитер! Самый лучший кросс-платформенный сервер — играй как с телефона,
-      так и с ПК. Уютная майнкрафт-деревня, ивенты, квесты и прокачка навыков.
+    <p class="lead">
+      Кросс-платформенный Minecraft-сервер. Java и Bedrock живут в одном мире,
+      плагинов минимум — ваниль, к которой добавлено ровно то, ради чего
+      хочется возвращаться.
     </p>
 
-    <div class="ip-wrap">
-      <div class="ip-card" id="ipCard" role="button" tabindex="0"
-           aria-label="Скопировать IP сервера bebra-maximum.ru">
-        <span class="ip-text">
-          <span class="ip-label">IP сервера</span>
-          <span class="ip-value" id="ipValue">bebra-maximum.ru</span>
-        </span>
-        <span class="ip-copy-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <rect x="9" y="9" width="11" height="11" rx="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    <div class="ipbar">
+      <div class="val">
+        <span class="lbl">Адрес сервера</span>
+        <span class="addr" id="addr">bebra-maximum.ru</span>
+      </div>
+      <button type="button" id="copy">Скопировать</button>
+    </div>
+
+    <p class="hint">
+      Java — <b>bebra-maximum.ru</b>, порт <b>19048</b> · Bedrock — тот же адрес, порт <b>19709</b>
+    </p>
+
+    <div class="cta">
+      <a class="btn btn-blue" href="#connect">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h13M12.5 6l6 6-6 6"/>
+        </svg>
+        Как подключиться
+      </a>
+      <a class="btn btn-ghost" href="#gallery">Посмотреть, как выглядит</a>
+    </div>
+  </div>
+
+  <!-- 3D-остров собирается скриптом внизу страницы -->
+  <div class="island" id="island" aria-hidden="true">
+    <div class="shadow"></div>
+    <div class="world" id="world">
+      <div class="spin" id="spin"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= живые данные ================= -->
+<section class="sec" id="live">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Прямо сейчас</span>
+      <h2>Сколько людей в игре</h2>
+      <p>Данные не с чужого сайта-мониторинга: страница сама стучится на игровой сервер по TCP и UDP и показывает то, что он ответил.</p>
+    </div>
+
+    <div class="live-top rv">
+      <span class="pill" id="pill">Подключаюсь к мониторингу…</span>
+      <span class="stamp" id="stamp">—</span>
+    </div>
+
+    <div class="total rv">
+      <span class="num" id="totalNum">—</span>
+      <span class="cap" id="totalCap">игроков онлайн прямо сейчас</span>
+      <span class="peak">рекорд за всё время — <b id="recNum">8</b></span>
+    </div>
+
+    <div class="grid rv">
+      <div class="card java">
+        <div class="card-top">
+          <h3>Java Edition</h3>
+          <span class="badge" id="jBadge">нет данных</span>
+        </div>
+        <dl class="kv">
+          <dt>Игроков</dt><dd id="jPlayers">—</dd>
+          <dt>Версия</dt><dd id="jVer">—</dd>
+          <dt>Отклик</dt><dd id="jPing">—</dd>
+        </dl>
+        <div class="bar"><i id="jBar"></i></div>
+      </div>
+
+      <div class="card bedrock">
+        <div class="card-top">
+          <h3>Bedrock Edition</h3>
+          <span class="badge" id="bBadge">нет данных</span>
+        </div>
+        <dl class="kv">
+          <dt>Игроков</dt><dd id="bPlayers">—</dd>
+          <dt>Версия</dt><dd id="bVer">—</dd>
+          <dt>Отклик</dt><dd id="bPing">—</dd>
+        </dl>
+        <div class="bar"><i id="bBar"></i></div>
+      </div>
+    </div>
+
+    <div class="chart rv">
+      <div class="chart-head">
+        <h3>Онлайн за последние минуты</h3>
+        <span id="chartNote">ждём данные…</span>
+      </div>
+      <svg viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="График онлайна">
+        <defs>
+          <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#29ABE2" stop-opacity=".38"/>
+            <stop offset="100%" stop-color="#29ABE2" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path id="sparkArea" fill="url(#fillGrad)" d=""></path>
+        <path id="sparkLine" fill="none" stroke="#29ABE2" stroke-width="2.5"
+              stroke-linejoin="round" stroke-linecap="round" d=""></path>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= галерея =================
+     Скриншоты игроков, лежали в группе сервера ВКонтакте.
+     Ничего не рисовал и не генерировал — только подрезал и сжал. -->
+<section class="sec" id="gallery">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Как это выглядит</span>
+      <h2>Фотографии с сервера</h2>
+      <p>Скриншоты игроков. Нажмите на любую, чтобы открыть во весь экран.</p>
+    </div>
+
+    <div class="gal">
+      <figure class="shot w4 rv">
+        <img src="img/builds.jpg" alt="Дома и вишнёвые деревья" loading="lazy">
+        <figcaption>Постройки игроков</figcaption>
+      </figure>
+      <figure class="shot w2 rv">
+        <img src="img/fortress.jpg" alt="Каменная стена с фонарями у воды" loading="lazy">
+        <figcaption>Крепость у воды</figcaption>
+      </figure>
+      <figure class="shot w3 rv">
+        <img src="img/spawn.jpg" alt="Вид на спавн снизу" loading="lazy">
+        <figcaption>Спавн</figcaption>
+      </figure>
+      <figure class="shot w3 rv">
+        <img src="img/spawn-top.jpg" alt="Статуи наверху спавна" loading="lazy">
+        <figcaption>Статуи на спавне</figcaption>
+      </figure>
+      <figure class="shot w6 rv">
+        <img src="img/sunset.jpg" alt="Закат над саванной" loading="lazy">
+        <figcaption>Закат над саванной</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= о сервере ================= -->
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Что это за место</span>
+      <h2>О сервере</h2>
+    </div>
+
+    <div class="about">
+      <div class="rv">
+        <p>
+          BEBRA-MAXIMUM — небольшой сервер, который делают несколько человек для таких же
+          игроков, а не студия с бюджетом. Ставка на <b>ваниль</b>: никаких телепортаций,
+          стартовых наборов и доната — до всего доходишь сам, и именно это здесь
+          считается нормальным.
+        </p>
+        <p>
+          Плагинов минимум, чтобы не ломать ванильный стиль: они добавлены только там,
+          где разнообразят рутину и дают больше способов самовыражения. Основные
+          направления — строительство, ивенты, квесты и прокачка навыков.
+        </p>
+        <p>
+          Главное отличие — <b>Java и Bedrock играют вместе</b>. Можно сидеть за компьютером,
+          а друг рядом — с телефона, и вы будете в одном мире. Серверу год: годовщина
+          6 сентября, к ней как раз обновили медные данжи и добавили особые ключи.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= фичи ================= -->
+<section class="sec" id="features">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Чем заняться</span>
+      <h2>Что внутри</h2>
+      <p>Коротко о том, ради чего тут собираются.</p>
+    </div>
+
+    <div class="feat">
+      <div class="f rv">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 10.6 12 3.2l9 7.4"/>
+            <path d="M5.6 9.4V20h12.8V9.4"/>
+            <path d="M10 20v-5.4h4V20"/>
           </svg>
-        </span>
-      </div>
-      <span class="ip-port">📱 Порт для Bedrock (телефон): 19709</span>
-    </div>
-
-    <div class="hero-buttons">
-      <a class="btn btn-primary" href="#how">Как подключиться</a>
-      <a class="btn btn-discord" href="https://discord.gg/CfSu8cgV" target="_blank" rel="noopener noreferrer">Discord сервер</a>
-    </div>
-  </div>
-</section>
-
-<!-- ============ СТАТУС СЕРВЕРА ============ -->
-<section class="section" id="status">
-  <div class="container">
-    <div class="section-head reveal">
-      <h2 class="section-title">Статус сервера</h2>
-      <div class="title-bar"></div>
-    </div>
-
-    <div class="status-panel reveal">
-      <div class="status-top">
-        <div class="status-top-left">
-          <span class="status-pulse" id="statusPulse" aria-hidden="true"></span>
-          <span class="status-headline">
-            <b id="statusHeadline">Проверяем сервер…</b>
-            <span id="statusSub">Запрос к серверу bebra-maximum.ru</span>
-          </span>
         </div>
-        <button class="refresh-btn" id="refreshBtn" type="button" aria-label="Обновить статус сервера">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
-            <path d="M21 3v6h-6"></path>
-          </svg>
-          Обновить
-        </button>
-      </div>
-
-      <div class="status-grid">
-        <div class="stat">
-          <div class="stat-label">Java Edition</div>
-          <div class="stat-value pending" id="statJava">
-            <span class="stat-dot" aria-hidden="true"></span>
-            <span>—</span>
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Игроков онлайн</div>
-          <div class="stat-value pending" id="statPlayers">—</div>
-          <div class="stat-bar"><i id="statPlayersBar"></i></div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Bedrock · порт 19709</div>
-          <div class="stat-value pending" id="statBedrock">
-            <span class="stat-dot" aria-hidden="true"></span>
-            <span>—</span>
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Обновлено</div>
-          <div class="stat-value pending" id="statUpdated">—</div>
-        </div>
-      </div>
-
-      <div class="status-motd" id="statusMotd" hidden>
-        <b>MOTD</b>
-        <span id="statusMotdText"></span>
-      </div>
-
-      <p class="status-note">
-        Данные берутся в реальном времени из открытого API
-        <a href="https://mcsrvstat.us" target="_blank" rel="noopener noreferrer">mcsrvstat.us</a>
-        и обновляются автоматически раз в минуту.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ О СЕРВЕРЕ ============ -->
-<section class="section" id="about">
-  <div class="container">
-    <div class="section-head reveal">
-      <h2 class="section-title">О сервере</h2>
-      <div class="title-bar"></div>
-    </div>
-
-    <div class="about-panel reveal">
-      <p>
-        Мы создали комфортную Minecraft-деревню — место, где хочется строить, общаться
-        и развиваться. Минимум плагинов, чтобы сохранить ванильный стиль игры, но при
-        этом разнообразить рутинные задачи и добавить больше способов самовыражения.
-      </p>
-      <p>
-        Никаких RTP, китов и прочего — только чистый геймплей, который мы все любим.
-      </p>
-      <div class="quote">«Ждём активных и творческих игроков на нашем сервере!»</div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ НАПРАВЛЕНИЯ ============ -->
-<section class="section" id="features">
-  <div class="container">
-    <div class="section-head reveal">
-      <h2 class="section-title">Основные направления</h2>
-      <div class="title-bar"></div>
-    </div>
-
-    <div class="features-grid">
-      <article class="card feature reveal">
-        <div class="feature-icon" aria-hidden="true">🏗️</div>
         <h3>Строительство</h3>
-        <p>Создавай деревню своей мечты, строй общие проекты и воплощай самые смелые идеи вместе с другими игроками.</p>
-      </article>
+        <p>Главное занятие на сервере. Приватов нет, так что место под стройку выбираешь сам.</p>
+      </div>
 
-      <article class="card feature reveal">
-        <div class="feature-icon" aria-hidden="true">🎉</div>
-        <h3>Ивенты</h3>
-        <p>Регулярные события: конкурсы, мини-игры, коллективные стройки и праздничные мероприятия.</p>
-      </article>
+      <div class="f rv">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="7.4" width="18" height="12.2" rx="2"/>
+            <path d="M3 12.6h18"/>
+            <path d="M10.4 10v3.2h3.2V10z"/>
+          </svg>
+        </div>
+        <h3>Медные данжи</h3>
+        <p>Ломать их нельзя — мусора от других не будет. Лут в бочках обнуляется раз в день, так что ходить есть смысл каждый день.</p>
+      </div>
 
-      <article class="card feature reveal">
-        <div class="feature-icon" aria-hidden="true">📜</div>
-        <h3>Квесты</h3>
-        <p>Интересные задания, за которые можно получить награды и прокачать своего персонажа.</p>
-      </article>
+      <div class="f rv">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="7.6" cy="7.6" r="3.9"/>
+            <path d="M10.5 10.5 20.5 20.5"/>
+            <path d="M16.6 16.6 19 14.2"/>
+            <path d="M18.9 18.9 21.3 16.5"/>
+          </svg>
+        </div>
+        <h3>Особые ключи</h3>
+        <p>Открывают хранилища в данже повторно, не дожидаясь обнуления. Покупаются за голоса за сервер, скрафтить нельзя.</p>
+      </div>
 
-      <article class="card feature reveal">
-        <div class="feature-icon" aria-hidden="true">⚔️</div>
-        <h3>Прокачка навыков</h3>
-        <p>Развивай своего персонажа в разных направлениях и открывай новые возможности.</p>
-      </article>
+      <div class="f rv">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2.2" y="4.2" width="13.4" height="9.6" rx="1.6"/>
+            <path d="M6.2 17.4h6.2"/>
+            <path d="M8.9 13.8v3.6"/>
+            <rect x="17.6" y="8.4" width="4.4" height="11.4" rx="1.6"/>
+          </svg>
+        </div>
+        <h3>Java + Bedrock</h3>
+        <p>Один мир на все платформы: компьютер, телефон, планшет. Пиратская версия тоже пускается.</p>
+      </div>
 
-      <article class="card feature reveal">
-        <div class="feature-icon" aria-hidden="true">🌿</div>
-        <h3>Ванильный стиль</h3>
-        <p>Минимум плагинов — максимум чистого Minecraft. Никаких RTP, китов и лишнего шума.</p>
-      </article>
+      <div class="f rv">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3.2l7.2 3v5.4c0 4.3-3 8-7.2 9.4-4.2-1.4-7.2-5.1-7.2-9.4V6.2z"/>
+            <path d="M9 12.1l2.1 2.1 4-4.2"/>
+          </svg>
+        </div>
+        <h3>Без доната и китов</h3>
+        <p>Нет ни магазина за реальные деньги, ни стартовых наборов, ни привата. Всё, что есть, добыто руками.</p>
+      </div>
 
-      <article class="card feature reveal">
-        <div class="feature-icon" aria-hidden="true">📱</div>
-        <h3>Кросс-платформа</h3>
-        <p>Играй откуда угодно — с телефона (Bedrock) или с ПК (Java). Все вместе на одном сервере.</p>
-      </article>
+      <div class="f rv">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3.6 18.4l4.8-5.1 3.4 3.1 7.2-7.4"/>
+            <path d="M15 8.6h5.4v5.4"/>
+            <path d="M3.6 21.4h16.8"/>
+          </svg>
+        </div>
+        <h3>Квесты и прокачка</h3>
+        <p>Ивенты и задания с наградами, плюс навыки, которые качаются сами по ходу игры.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============ КАК ИГРАТЬ ============ -->
-<section class="section" id="how">
-  <div class="container">
-    <div class="section-head reveal">
-      <h2 class="section-title">Как играть</h2>
-      <div class="title-bar"></div>
+<!-- ================= как зайти ================= -->
+<section class="sec" id="connect">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Подключение</span>
+      <h2>Как зайти</h2>
+      <p>Три шага, дальше всё как обычно.</p>
     </div>
 
-    <div class="steps-grid">
-      <article class="card step reveal">
-        <span class="step-num">01</span>
-        <h3>Скачай Minecraft</h3>
-        <p>Java Edition для ПК или Bedrock Edition для телефона / консоли.</p>
-      </article>
+    <div class="steps">
+      <div class="st rv">
+        <h3>Запустите нужную версию</h3>
+        <p>Java — любой релиз от 1.7.2 до 1.21.11. Bedrock — обычный Minecraft с телефона, планшета или Windows.</p>
+      </div>
+      <div class="st rv">
+        <h3>Добавьте сервер</h3>
+        <p>Адрес один и тот же — <code>bebra-maximum.ru</code>. Порт зависит от платформы, смотрите таблицу ниже.</p>
+      </div>
+      <div class="st rv">
+        <h3>Заходите</h3>
+        <p>Первый вход — в общий мир. Дальше выбираете место под стройку и строитесь.</p>
+      </div>
+    </div>
 
-      <article class="card step reveal">
-        <span class="step-num">02</span>
-        <h3>Добавь сервер</h3>
-        <p>Открой «Сетевая игра» → «Добавить сервер» и впиши IP.</p>
-      </article>
-
-      <article class="card step reveal">
-        <span class="step-num">03</span>
-        <h3>Bedrock порт</h3>
-        <p>Укажи порт 19709 в настройках подключения.</p>
-      </article>
-
-      <article class="card step reveal">
-        <span class="step-num">04</span>
-        <h3>Заходи в игру!</h3>
-        <p>Добро пожаловать в нашу уютную деревню 🎮</p>
-      </article>
+    <div class="ports">
+      <div class="port rv">
+        <span class="pl">Java</span>
+        <span>bebra-maximum.ru</span>
+        <span class="pn">19048</span>
+      </div>
+      <div class="port rv">
+        <span class="pl">Bedrock</span>
+        <span>bebra-maximum.ru</span>
+        <span class="pn">19709</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============ СОЦСЕТИ ============ -->
-<section class="section" id="socials">
-  <div class="container">
-    <div class="section-head reveal">
-      <h2 class="section-title">Наши соцсети</h2>
-      <div class="title-bar"></div>
+<!-- ================= соцсети ================= -->
+<section class="sec" id="socials">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Связь</span>
+      <h2>Где мы общаемся</h2>
+      <p>Анонсы обновлений, скриншоты и поиск напарников — всё там.</p>
     </div>
 
-    <div class="socials-grid">
-      <a class="card social reveal" href="https://discord.gg/CfSu8cgV" target="_blank" rel="noopener noreferrer">
-        <span class="social-icon" aria-hidden="true">💬</span>
-        <h3>Discord</h3>
-        <span>discord.gg/CfSu8cgV</span>
-        <span class="social-arrow">Перейти →</span>
+    <div class="socs">
+      <a class="soc vk rv" href="https://vk.com/bebra_maximum" target="_blank" rel="noopener">
+        <span class="mk">VK</span>
+        <span>ВКонтакте<small>Новости и обновления</small></span>
+        <span class="go">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 5.5l6.5 6.5L9 18.5"/>
+          </svg>
+        </span>
       </a>
 
-      <a class="card social reveal" href="https://t.me/bebra_maximum" target="_blank" rel="noopener noreferrer">
-        <span class="social-icon" aria-hidden="true">✈️</span>
-        <h3>Telegram</h3>
-        <span>@bebra_maximum</span>
-        <span class="social-arrow">Перейти →</span>
+      <a class="soc tg rv" href="https://t.me/bebra_maximum" target="_blank" rel="noopener">
+        <span class="mk">TG</span>
+        <span>Telegram<small>Быстрые объявления</small></span>
+        <span class="go">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 5.5l6.5 6.5L9 18.5"/>
+          </svg>
+        </span>
       </a>
 
-      <a class="card social reveal" href="https://www.tiktok.com/@bebra.maximum" target="_blank" rel="noopener noreferrer">
-        <span class="social-icon" aria-hidden="true">🎵</span>
-        <h3>TikTok</h3>
-        <span>@bebra.maximum</span>
-        <span class="social-arrow">Перейти →</span>
-      </a>
-
-      <a class="card social reveal" href="https://vk.com/bebra_maximum" target="_blank" rel="noopener noreferrer">
-        <span class="social-icon" aria-hidden="true">🔵</span>
-        <h3>ВКонтакте</h3>
-        <span>vk.com/bebra_maximum</span>
-        <span class="social-arrow">Перейти →</span>
+      <a class="soc ds rv" href="https://discord.gg/qNChNXmC" target="_blank" rel="noopener">
+        <span class="mk">DS</span>
+        <span>Discord<small>Голос и поиск напарников</small></span>
+        <span class="go">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 5.5l6.5 6.5L9 18.5"/>
+          </svg>
+        </span>
       </a>
     </div>
   </div>
 </section>
 
-</main>
-
-<!-- ============ ФУТЕР ============ -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <img src="logo-banner.jpg" alt="BEBRA-MAXIMUM" data-fallback-size="sm" onerror="logoFallback(this)">
-        <p>Кросс-платформенный Minecraft-сервер: уютная деревня, ивенты, квесты и прокачка навыков. Играй с телефона или с ПК.</p>
-      </div>
-
-      <div class="footer-col">
-        <h4>Навигация</h4>
-        <ul>
-          <li><a href="#about">О сервере</a></li>
-          <li><a href="#features">Особенности</a></li>
-          <li><a href="#status">Статус сервера</a></li>
-          <li><a href="#how">Как играть</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Соцсети</h4>
-        <ul>
-          <li><a href="https://discord.gg/CfSu8cgV" target="_blank" rel="noopener noreferrer">Discord</a></li>
-          <li><a href="https://t.me/bebra_maximum" target="_blank" rel="noopener noreferrer">Telegram</a></li>
-          <li><a href="https://www.tiktok.com/@bebra.maximum" target="_blank" rel="noopener noreferrer">TikTok</a></li>
-          <li><a href="https://vk.com/bebra_maximum" target="_blank" rel="noopener noreferrer">ВКонтакте</a></li>
-        </ul>
-      </div>
+<!-- ================= футер ================= -->
+<footer class="foot">
+  <div class="wrap">
+    <div>
+      <b>BEBRA-MAXIMUM</b> · 2025—2026
     </div>
-
-    <div class="footer-bottom">
-      © 2025 Bebra Maximum · Сделано с ❤️ для джигитеров
+    <div class="r">
+      Не связан с Mojang AB и Microsoft.<br>
+      Онлайн на этой странице считается своим кодом, без сторонних сервисов.
     </div>
   </div>
 </footer>
 
-<div class="toast" id="toast" role="status" aria-live="polite">✓ Скопировано!</div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр фотографии">
+  <img id="lbImg" src="" alt="">
+  <p id="lbCap"></p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-(function(){
+(function () {
   'use strict';
 
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (s) { return document.querySelector(s); };
+  var root = document.documentElement;
 
-  /* ---------- ШАПКА ПРИ СКРОЛЛЕ ---------- */
-  var header = document.getElementById('header');
-  function onScroll(){
-    if(window.scrollY > 40){ header.classList.add('scrolled'); }
-    else { header.classList.remove('scrolled'); }
+  /* ================= тема ================= */
+
+  var tgl = $('#tgl');
+
+  tgl.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('bebra-theme', next); } catch (e) {}
+  });
+
+  /* ================= тост ================= */
+
+  var toastEl = $('#toast');
+  var toastTimer = null;
+
+  function toast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove('show');
+    }, 1900); // дольше держать смысла нет
   }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  onScroll();
 
-  /* ---------- ПОЯВЛЕНИЕ СЕКЦИЙ ---------- */
-  var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  /* ================= копирование адреса ================= */
 
-  if(reduceMotion || !('IntersectionObserver' in window)){
-    revealEls.forEach(function(el){ el.classList.add('visible'); });
-  } else {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){
-          var el = entry.target;
-          var delay = parseInt(el.dataset.delay || '0', 10);
-          setTimeout(function(){ el.classList.add('visible'); }, delay);
-          io.unobserve(el);
-        }
+  var addrEl = $('#addr');
+
+  $('#copy').addEventListener('click', function () {
+    var text = addrEl.textContent.trim();
+
+    function done() { toast('Адрес скопирован: ' + text); }
+
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch (e) { toast('Не получилось скопировать, адрес: ' + text); }
+      document.body.removeChild(ta);
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      // на http и в старых браузерах clipboard недоступен — делаем вручную
+      fallback();
+    }
+  });
+
+  /* ================= появление при скролле ================= */
+
+  var items = [].slice.call(document.querySelectorAll('.rv'));
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        // небольшая задержка по порядку — выходит как бы волной
+        var i = Number(el.dataset.i || 0);
+        var delay = Math.min(i * 60, 300);
+        el.style.transitionDelay = delay + 'ms';
+        el.classList.add('in');
+        io.unobserve(el);
+        // задержку обязательно снять: иначе она тормозит ещё и hover
+        setTimeout(function () { el.style.transitionDelay = ''; }, delay + 700);
       });
-    }, {threshold:0.12, rootMargin:'0px 0px -60px 0px'});
+    }, { rootMargin: '0px 0px -8% 0px', threshold: .12 });
 
-    revealEls.forEach(function(el){
-      var parent = el.parentNode;
-      var siblings = parent ? Array.prototype.filter.call(parent.children, function(c){
-        return c.classList && c.classList.contains('reveal');
-      }) : [];
-      var pos = siblings.indexOf(el);
-      if(siblings.length > 1 && pos > -1){
-        el.dataset.delay = String(pos * 80);
-      }
+    items.forEach(function (el, i) {
+      el.dataset.i = i % 6;
       io.observe(el);
     });
+  } else {
+    items.forEach(function (el) { el.classList.add('in'); });
   }
 
-  /* ---------- ЧАСТИЦЫ ---------- */
-  var particlesBox = document.getElementById('particles');
-  if(particlesBox && !reduceMotion){
-    var count = window.innerWidth < 768 ? 16 : 30;
-    var frag = document.createDocumentFragment();
-    for(var i = 0; i < count; i++){
-      var p = document.createElement('span');
-      var size = (Math.random() * 5 + 3).toFixed(1);
-      p.className = 'particle';
-      p.style.left = (Math.random() * 100).toFixed(2) + '%';
-      p.style.width = size + 'px';
-      p.style.height = size + 'px';
-      p.style.animationDuration = (Math.random() * 14 + 9).toFixed(1) + 's';
-      p.style.animationDelay = '-' + (Math.random() * 20).toFixed(1) + 's';
-      p.style.setProperty('--dx', ((Math.random() * 120) - 60).toFixed(0) + 'px');
-      p.style.opacity = (Math.random() * 0.35 + 0.25).toFixed(2);
-      frag.appendChild(p);
+  /* ================= просмотр фото ================= */
+
+  var lb = $('#lb');
+  var lbImg = $('#lbImg');
+  var lbCap = $('#lbCap');
+
+  function closeLb() {
+    lb.classList.remove('open');
+    lbImg.setAttribute('src', '');
+  }
+
+  [].forEach.call(document.querySelectorAll('.shot'), function (fig) {
+    fig.addEventListener('click', function () {
+      var img = fig.querySelector('img');
+      var cap = fig.querySelector('figcaption');
+      lbImg.setAttribute('src', img.getAttribute('src'));
+      lbImg.setAttribute('alt', img.getAttribute('alt') || '');
+      lbCap.textContent = cap ? cap.textContent : '';
+      lb.classList.add('open');
+    });
+  });
+
+  lb.addEventListener('click', closeLb);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && lb.classList.contains('open')) closeLb();
+  });
+
+  /* ================= 3D-сцена =================
+     Текстуры не файлами, а кодом: каждая — 16x16 пикселей, которые
+     скрипт раскладывает в SVG и кладёт в CSS-переменные. Блок — пять
+     граней; грань, закрытая соседним блоком, вообще не рисуется.
+     ---------------------------------------------------------- */
+
+  (function buildIsland() {
+    var spin = document.getElementById('spin');
+    var world = document.getElementById('world');
+    var island = document.getElementById('island');
+    if (!spin || !world || !island) return;
+
+    var S = 26; // сторона блока в пикселях, совпадает с --s в CSS
+
+    /* ---------------- текстуры ---------------- */
+
+    var PX = 16;
+
+    /* Маленький предсказуемый генератор: текстуры должны быть одинаковые
+       при каждой загрузке, а не пересобираться заново. */
+    function rng(seed) {
+      var s = seed >>> 0;
+      return function () {
+        s = (s + 0x6D2B79F5) >>> 0;
+        var t = s;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     }
-    particlesBox.appendChild(frag);
-  }
 
-  /* ---------- КОПИРОВАНИЕ IP ---------- */
-  var toast = document.getElementById('toast');
-  var toastTimer = null;
-  var ipCard = document.getElementById('ipCard');
-  var ipValue = document.getElementById('ipValue');
+    function pick(r, list) { return list[Math.floor(r() * list.length)]; }
 
-  function showToast(text){
-    toast.textContent = text;
-    toast.classList.add('show');
-    if(toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2000);
-  }
+    function noise(r, list) {
+      var out = [];
+      for (var i = 0; i < PX * PX; i++) out.push(pick(r, list));
+      return out;
+    }
 
-  function legacyCopy(text){
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('readonly', '');
-    ta.style.position = 'fixed';
-    ta.style.top = '-1000px';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    ta.setSelectionRange(0, ta.value.length);
-    var ok = false;
-    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
-    document.body.removeChild(ta);
-    return ok;
-  }
+    /* Палитры нарочно близкие по тону: при блоке в 26 пикселей резкие
+       пятна читаются как телевизионный шум, а не как материал. */
+    var GRASS = ['#6fae43', '#68a63d', '#77b449', '#63a039'];
+    var DIRT = ['#8b6239', '#845c34', '#91683c', '#7d5731'];
+    var STONE = ['#8a8a8a', '#848484', '#909090', '#7e7e7e'];
+    var SAND = ['#ded3a5', '#e6dcb2', '#d3c795', '#eae1bc'];
+    var BARK = ['#6b4f2a', '#5f4726', '#77562f', '#6a4d28'];
+    /* листва нарочно темнее и глуше травы: в игре они близки по тону,
+       но здесь дерево должно читаться с одного взгляда */
+    var LEAF = ['#245f18', '#1c4f12', '#2c7020', '#16400e'];
+    var COPPER = ['#c47a45', '#b06b3d', '#d18c57', '#a35f34'];
 
-  function copyIp(){
-    var text = ipValue.textContent.trim();
-    var done = function(ok){
-      if(ok){
-        ipCard.classList.add('copied');
-        showToast('✓ Скопировано!');
-        setTimeout(function(){ ipCard.classList.remove('copied'); }, 1400);
-      } else {
-        showToast('Не удалось скопировать');
+    var TEX = {
+      grasstop: function (r) { return noise(r, GRASS); },
+
+      /* дёрн сбоку: земля, сверху зелёная кромка с рваным краем */
+      grassside: function (r) {
+        var px = noise(r, DIRT);
+        for (var x = 0; x < PX; x++) {
+          var edge = 3 + Math.floor(r() * 3);
+          for (var y = 0; y < edge; y++) px[y * PX + x] = pick(r, GRASS);
+        }
+        return px;
+      },
+
+      dirt: function (r) { return noise(r, DIRT); },
+      stone: function (r) { return noise(r, STONE); },
+      sand: function (r) { return noise(r, SAND); },
+
+      /* булыжник: крупные камни со швами */
+      cobble: function (r) {
+        var px = [];
+        var face = ['#9a9a9a', '#a4a4a4', '#909090', '#8b8b8b'];
+        var map = [
+          'AAA.BBBB',
+          'AAA.BBBB',
+          '...CCCCC',
+          'DDD.CCCC',
+          'DDD.....',
+          '.EEE.FFF',
+          '.EEE.FFF',
+          '........'
+        ];
+        for (var y = 0; y < PX; y++) {
+          for (var x = 0; x < PX; x++) {
+            var ch = map[(y >> 1) & 7][(x >> 1) & 7];
+            px.push(ch === '.' ? '#5f5f5f' : pick(r, face));
+          }
+        }
+        return px;
+      },
+
+      /* бревно: полосы коры вдоль ствола */
+      logside: function (r) {
+        var px = [];
+        for (var x = 0; x < PX; x++) {
+          var base = pick(r, BARK);
+          for (var y = 0; y < PX; y++) {
+            px.push(r() < 0.18 ? pick(r, BARK) : base);
+          }
+        }
+        return px;
+      },
+
+      /* спил: годовые кольца */
+      logtop: function (r) {
+        var px = [];
+        for (var y = 0; y < PX; y++) {
+          for (var x = 0; x < PX; x++) {
+            var dx = x - 7.5, dy = y - 7.5;
+            var ring = Math.floor(Math.sqrt(dx * dx + dy * dy) / 2.2) & 1;
+            px.push(ring ? '#6b4f2a' : '#82603a');
+          }
+        }
+        return px;
+      },
+
+      /* листва: с просветами, поэтому местами null — пиксель не рисуем */
+      leaves: function (r) {
+        var px = [];
+        for (var i = 0; i < PX * PX; i++) px.push(r() < 0.16 ? null : pick(r, LEAF));
+        return px;
+      },
+
+      water: function (r) {
+        var px = [];
+        for (var y = 0; y < PX; y++) {
+          for (var x = 0; x < PX; x++) {
+            var w = Math.sin(x * 0.9 + y * 0.5) + Math.sin(x * 0.4 - y * 0.8);
+            px.push(w > 0.35 ? '#4ea5e0' : '#3f93d4');
+          }
+        }
+        return px;
+      },
+
+      /* медная руда: камень с вкраплениями */
+      copper: function (r) {
+        var px = noise(r, STONE);
+        [[2, 3], [3, 3], [3, 4], [2, 4], [11, 2], [12, 2], [12, 3], [11, 3],
+         [6, 10], [7, 10], [7, 11], [6, 11], [13, 12], [14, 12], [13, 13],
+         [5, 6], [6, 6], [6, 7], [9, 14], [10, 14]].forEach(function (p) {
+          px[p[1] * PX + p[0]] = pick(r, COPPER);
+        });
+        return px;
       }
     };
 
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){
-        done(legacyCopy(text));
+    /* Пиксели → data-URI. Одинаковые цвета собираем в один path,
+       иначе SVG выходит в разы длиннее и страница пухнет. */
+    function texURI(px) {
+      var byColor = {};
+      for (var i = 0; i < px.length; i++) {
+        if (!px[i]) continue;
+        (byColor[px[i]] || (byColor[px[i]] = [])).push(i);
+      }
+      var body = '';
+      Object.keys(byColor).forEach(function (c) {
+        var d = byColor[c].map(function (i) {
+          return 'M' + (i % PX) + ' ' + Math.floor(i / PX) + 'h1v1h-1z';
+        }).join('');
+        body += '<path fill="' + c + '" d="' + d + '"/>';
       });
-    } else {
-      done(legacyCopy(text));
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + PX + '" height="' + PX +
+                '" shape-rendering="crispEdges">' + body + '</svg>';
+      return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
     }
-  }
 
-  if(ipCard){
-    ipCard.addEventListener('click', copyIp);
-    ipCard.addEventListener('keydown', function(e){
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault();
-        copyIp();
+    var seed = 20260906; // дата годовщины сервера, пусть будет
+    Object.keys(TEX).forEach(function (name) {
+      island.style.setProperty('--t-' + name, texURI(TEX[name](rng(seed++))));
+    });
+
+    /* ---------------- рельеф ---------------- */
+
+    var N = 7;      // сетка 7x7
+    var HALF = 3;   // центр
+
+    /* силуэт: квадрат со срезанными углами, иначе читается как куб */
+    function inShape(x, z) {
+      var cx = Math.min(x, N - 1 - x);
+      var cz = Math.min(z, N - 1 - z);
+      return cx + cz >= 1;
+    }
+
+    /* Два холма. Спадают по косинусу — вершина выходит округлой,
+       а не ступенькой, как от прямого вычитания. */
+    var HILLS = [
+      { x: 1.8, z: 1.8, h: 3.2, r: 2.4 },
+      { x: 2.2, z: 5.2, h: 1.6, r: 1.8 }
+    ];
+
+    function landH(x, z) {
+      var h = 0;
+      for (var i = 0; i < HILLS.length; i++) {
+        var H = HILLS[i];
+        var d = Math.sqrt((x - H.x) * (x - H.x) + (z - H.z) * (z - H.z));
+        if (d < H.r) h += H.h * Math.cos((d / H.r) * Math.PI / 2);
+      }
+      return Math.round(h);
+    }
+
+    /* Пруд лежит вровень с землёй — просто меняем материал верхнего блока,
+       никаких ям. У самого края вода срывается вниз, оттуда водопад. */
+    var POND = [[4, 4], [5, 4], [4, 5], [5, 5]];
+    var SPILL = [6, 5];
+
+    var surf = {};                       // 'x,z' -> высота поверхности
+    for (var z = 0; z < N; z++) {
+      for (var x = 0; x < N; x++) {
+        if (inShape(x, z)) surf[x + ',' + z] = landH(x, z);
+      }
+    }
+    POND.forEach(function (p) { surf[p[0] + ',' + p[1]] = 0; });
+    surf[SPILL[0] + ',' + SPILL[1]] = 0;
+
+    var pondSet = {}, sandSet = {};
+    POND.concat([SPILL]).forEach(function (p) {
+      pondSet[p[0] + ',' + p[1]] = true;
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (n) {
+        var k2 = (p[0] + n[0]) + ',' + (p[1] + n[1]);
+        if (surf[k2] !== undefined && !pondSet[k2]) sandSet[k2] = true;
+      });
+    });
+
+    var cells = {};
+    var key = function (x, y, z) { return x + '|' + y + '|' + z; };
+    var setC = function (x, y, z, kind) { cells[key(x, y, z)] = kind; };
+    var getC = function (x, y, z) { return cells[key(x, y, z)]; };
+
+    var r = rng(4242);
+
+    Object.keys(surf).forEach(function (k2) {
+      var p = k2.split(',');
+      var x = +p[0], z = +p[1];
+      var top = -surf[k2];
+      var d = Math.sqrt((x - HALF) * (x - HALF) + (z - HALF) * (z - HALF));
+
+      /* низ сходится конусом — так остров читается как парящий, а не как срез */
+      var deep = Math.max(1, Math.round((4.0 - d) * 1.3));
+
+      /* обрыв: если сосед заметно ниже, верхние блоки — голый камень */
+      var steep = false;
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (n) {
+        var nb = surf[(x + n[0]) + ',' + (z + n[1])];
+        if (nb !== undefined && surf[k2] - nb >= 2) steep = true;
+      });
+
+      var cap = pondSet[k2] ? 'water' : sandSet[k2] ? 'sand' : steep ? 'stone' : 'grass';
+      var body = cap === 'stone' ? 'stone'
+               : (cap === 'water' || cap === 'sand') ? 'sand' : 'dirt';
+
+      for (var y = top; y < top + deep; y++) {
+        setC(x, y, z, y === top ? cap
+                       : y <= top + 2 ? body
+                       : (r() < 0.15 ? 'copper' : 'stone'));
       }
     });
-  }
 
-  /* ---------- МОНИТОРИНГ ОНЛАЙНА ---------- */
-  var API_JAVA    = 'https://api.mcsrvstat.us/3/bebra-maximum.ru';
-  var API_BEDROCK = 'https://api.mcsrvstat.us/bedrock/3/bebra-maximum.ru:19709';
-  var REFRESH_MS  = 60000;
+    /* ---------------- дубы ----------------
+       Ствол оставляем открытым: в прошлой версии крона начиналась
+       от самой земли, и дерево сливалось с газоном. */
 
-  var elPulse      = document.getElementById('statusPulse');
-  var elHeadline   = document.getElementById('statusHeadline');
-  var elSub        = document.getElementById('statusSub');
-  var elJava       = document.getElementById('statJava');
-  var elPlayers    = document.getElementById('statPlayers');
-  var elPlayersBar = document.getElementById('statPlayersBar');
-  var elBedrock    = document.getElementById('statBedrock');
-  var elUpdated    = document.getElementById('statUpdated');
-  var elMotd       = document.getElementById('statusMotd');
-  var elMotdText   = document.getElementById('statusMotdText');
-  var elBadge      = document.getElementById('heroBadge');
-  var refreshBtn   = document.getElementById('refreshBtn');
+    function oak(cx, cz, trunkH, rad) {
+      var base = surf[cx + ',' + cz];
+      if (base === undefined) return;
+      var top = -base;
 
-  function setStatusTile(el, cls, text){
-    el.className = 'stat-value ' + cls;
-    el.innerHTML = '<span class="stat-dot" aria-hidden="true"></span><span>' + text + '</span>';
-  }
+      for (var t = 1; t <= trunkH; t++) setC(cx, top - t, cz, 'log');
 
-  function setPlainTile(el, cls, html){
-    el.className = 'stat-value ' + cls;
-    el.innerHTML = html;
-  }
-
-  function clockTime(){
-    var d = new Date();
-    return String(d.getHours()).padStart(2,'0') + ':' +
-           String(d.getMinutes()).padStart(2,'0') + ':' +
-           String(d.getSeconds()).padStart(2,'0');
-  }
-
-  function fetchJson(url){
-    return fetch(url, {cache:'no-store'}).then(function(r){
-      if(!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    });
-  }
-
-  var loading = false;
-
-  function loadStatus(){
-    if(loading) return;
-    loading = true;
-    refreshBtn.classList.add('spinning');
-
-    Promise.allSettled([fetchJson(API_JAVA), fetchJson(API_BEDROCK)])
-      .then(function(results){
-        var java    = results[0].status === 'fulfilled' ? results[0].value : null;
-        var bedrock = results[1].status === 'fulfilled' ? results[1].value : null;
-
-        /* Java */
-        if(java && typeof java.online !== 'undefined'){
-          var javaOnline = !!java.online;
-          setStatusTile(elJava, javaOnline ? 'ok' : 'off', javaOnline ? 'Онлайн' : 'Офлайн');
-
-          var players = (java.players && typeof java.players.online === 'number') ? java.players.online : null;
-          var maxPlayers = (java.players && typeof java.players.max === 'number') ? java.players.max : null;
-
-          if(players !== null && maxPlayers !== null){
-            setPlainTile(elPlayers, '', players + ' <small>/ ' + maxPlayers + '</small>');
-            elPlayersBar.style.width = (maxPlayers > 0 ? Math.min(100, (players / maxPlayers) * 100) : 0) + '%';
-          } else if(players !== null){
-            setPlainTile(elPlayers, '', String(players));
-            elPlayersBar.style.width = '0%';
-          } else {
-            setPlainTile(elPlayers, 'pending', '—');
+      var head = top - trunkH;
+      function ring(cy, rr) {
+        for (var ax = -rr; ax <= rr; ax++) {
+          for (var az = -rr; az <= rr; az++) {
+            if (rr === 2 && Math.abs(ax) === 2 && Math.abs(az) === 2) continue;
+            if (getC(cx + ax, cy, cz + az)) continue;   // ствол не затираем
+            setC(cx + ax, cy, cz + az, 'leaves');
           }
-
-          elHeadline.textContent = javaOnline ? 'Сервер онлайн' : 'Сервер офлайн';
-          elSub.textContent = javaOnline
-            ? (players !== null && maxPlayers !== null
-                ? 'Игроков онлайн: ' + players + ' из ' + maxPlayers
-                : 'Сервер bebra-maximum.ru доступен')
-            : 'Сервер bebra-maximum.ru не отвечает';
-          elPulse.className = 'status-pulse ' + (javaOnline ? 'ok' : 'off');
-          elBadge.className = 'badge ' + (javaOnline ? '' : 'is-off');
-
-          var motd = '';
-          if(java.motd && java.motd.clean && java.motd.clean.length){
-            motd = java.motd.clean.filter(function(s){ return s && s.trim(); }).join(' ').trim();
-          }
-          if(motd){
-            elMotdText.textContent = motd;
-            elMotd.hidden = false;
-          } else {
-            elMotd.hidden = true;
-          }
-        } else {
-          setStatusTile(elJava, 'pending', 'Нет данных');
-          setPlainTile(elPlayers, 'pending', '—');
-          elHeadline.textContent = 'Не удалось получить статус';
-          elSub.textContent = 'Сервис проверки недоступен';
-          elPulse.className = 'status-pulse';
-          elBadge.className = 'badge is-unknown';
-          elMotd.hidden = true;
         }
-
-        /* Bedrock */
-        if(bedrock && typeof bedrock.online !== 'undefined'){
-          var bOnline = !!bedrock.online;
-          setStatusTile(elBedrock, bOnline ? 'ok' : 'off', bOnline ? 'Онлайн' : 'Офлайн');
-        } else {
-          setStatusTile(elBedrock, 'pending', 'Нет данных');
-        }
-
-        setPlainTile(elUpdated, '', clockTime());
-      })
-      .catch(function(){
-        setStatusTile(elJava, 'pending', 'Нет данных');
-        setPlainTile(elPlayers, 'pending', '—');
-        setStatusTile(elBedrock, 'pending', 'Нет данных');
-        setPlainTile(elUpdated, '', clockTime());
-        elHeadline.textContent = 'Не удалось получить статус';
-        elSub.textContent = 'Проверьте подключение к интернету';
-        elPulse.className = 'status-pulse';
-        elBadge.className = 'badge is-unknown';
-      })
-      .then(function(){
-        loading = false;
-        refreshBtn.classList.remove('spinning');
-      });
-  }
-
-  refreshBtn.addEventListener('click', loadStatus);
-
-  /* Запускаем опрос, когда блок статуса появился на экране */
-  var statusSection = document.getElementById('status');
-  var started = false;
-
-  function startPolling(){
-    if(started) return;
-    started = true;
-    loadStatus();
-    setInterval(loadStatus, REFRESH_MS);
-  }
-
-  if('IntersectionObserver' in window){
-    var sio = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){ startPolling(); sio.disconnect(); }
-      });
-    }, {threshold:0.15});
-    sio.observe(statusSection);
-  } else {
-    startPolling();
-  }
-
-  /* Бейдж в hero обновляем сразу, не дожидаясь скролла */
-  fetchJson(API_JAVA).then(function(java){
-    if(!java || typeof java.online === 'undefined') return;
-    elBadge.className = 'badge ' + (java.online ? '' : 'is-off');
-  }).catch(function(){
-    elBadge.className = 'badge is-unknown';
-  });
-
-  /* ---------- ПЛАВНЫЙ СКРОЛЛ ДЛЯ ЯКОРЕЙ ---------- */
-  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function(link){
-    link.addEventListener('click', function(e){
-      var id = link.getAttribute('href');
-      if(id === '#' || id === '#top'){
-        e.preventDefault();
-        window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'});
-        return;
       }
-      var target = document.querySelector(id);
-      if(!target) return;
-      e.preventDefault();
-      var offset = header.offsetHeight + 14;
-      var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-      window.scrollTo({top: top, behavior: reduceMotion ? 'auto' : 'smooth'});
+
+      ring(head, rad);
+      ring(head - 1, rad);
+      if (rad > 1) ring(head - 2, 1);
+      var capY = head - (rad > 1 ? 3 : 2);
+      if (!getC(cx, capY, cz)) setC(cx, capY, cz, 'leaves');
+    }
+
+    oak(5, 1, 3, 2);   // раскидистый, у дальнего края
+    oak(0, 5, 3, 1);   // поменьше, у воды
+
+    /* ---------------- водопад ----------------
+       Вода уходит за борт острова и падает в пустоту. */
+
+    for (var wy = 0; wy <= 3; wy++) setC(SPILL[0], wy, SPILL[1], 'water');
+
+    /* ---------------- сборка ----------------
+       Грань рисуем только там, где за ней пусто. Без этого на острове
+       набегает под тысячу лишних div'ов и всё начинает тормозить.
+       ---------------------------------------------------------- */
+
+    var DIRS = [
+      { dx: 0, dy: -1, dz: 0, cls: 't' },
+      { dx: 0, dy: 0, dz: 1, cls: 'n' },
+      { dx: 0, dy: 0, dz: -1, cls: 's' },
+      { dx: 1, dy: 0, dz: 0, cls: 'e' },
+      { dx: -1, dy: 0, dz: 0, cls: 'w' }
+    ];
+
+    var frag = document.createDocumentFragment();
+    var faces = 0;
+
+    Object.keys(cells).forEach(function (k) {
+      var p = k.split('|');
+      var x = +p[0], y = +p[1], z = +p[2];
+      var b = document.createElement('div');
+      b.className = 'vx ' + cells[k];
+      b.style.transform = 'translate3d(' + ((x - HALF) * S) + 'px,' + (y * S) + 'px,' + ((z - HALF) * S) + 'px)';
+
+      DIRS.forEach(function (d) {
+        if (getC(x + d.dx, y + d.dy, z + d.dz)) return;
+        var i = document.createElement('i');
+        i.className = d.cls;
+        b.appendChild(i);
+        faces++;
+      });
+
+      frag.appendChild(b);
     });
-  });
+
+    /* пара блоков висит рядом с островом */
+    function loneBlock(kind, x, dy, z, delay) {
+      var holder = document.createElement('div');
+      holder.className = 'fl';
+      /* центр сетки вычитаем так же, как у блоков острова, иначе
+         висящие блоки уезжают вбок и сцена выглядит кривой */
+      holder.style.transform = 'translate3d(' + ((x - HALF) * S) + 'px,'
+                             + (dy * S) + 'px,' + ((z - HALF) * S) + 'px)';
+
+      var bob = document.createElement('div');
+      bob.className = 'bob';
+      bob.style.animationDelay = delay + 's';
+
+      var b = document.createElement('div');
+      b.className = 'vx ' + kind;
+      ['t', 'n', 's', 'e', 'w'].forEach(function (f) {
+        var i = document.createElement('i');
+        i.className = f;
+        b.appendChild(i);
+      });
+
+      bob.appendChild(b);
+      holder.appendChild(bob);
+      frag.appendChild(holder);
+    }
+
+    loneBlock('grass', -2.0, -1.8, 2.6, 0);
+    loneBlock('stone', 8.0, -3.2, 2.0, -1.4);
+    loneBlock('sand', 7.6, -1.2, 4.4, -2.6);
+    loneBlock('leaves', -1.8, -3.0, 4.4, -0.8);
+    loneBlock('log', 6.4, -4.4, 0.6, -2.0);
+
+    spin.appendChild(frag);
+
+    /* сколько граней получилось — полезно, когда правишь рельеф */
+    island.dataset.faces = faces;
+
+    /* Сцена стоит на месте. Курсор заходит на неё — наклоняется вслед
+       за ним; курсор уходит за пределы — возвращается как было. */
+    var RX = -44;  // наклон по умолчанию
+    var RY = -24;  // поворот по умолчанию
+
+    function rest() {
+      world.classList.remove('tracking');
+      world.style.setProperty('--rx', RX + 'deg');
+      world.style.setProperty('--ry', RY + 'deg');
+    }
+
+    rest();
+
+    if (island && window.matchMedia('(hover: hover)').matches) {
+      island.addEventListener('pointerenter', function () {
+        world.classList.add('tracking');
+      });
+
+      island.addEventListener('pointermove', function (e) {
+        var r = island.getBoundingClientRect();
+        var nx = (e.clientX - r.left) / r.width - .5;   // -0.5 … 0.5
+        var ny = (e.clientY - r.top) / r.height - .5;
+        world.style.setProperty('--rx', (RX - ny * 32).toFixed(2) + 'deg');
+        world.style.setProperty('--ry', (RY + nx * 52).toFixed(2) + 'deg');
+      });
+
+      island.addEventListener('pointerleave', rest);
+    }
+  })();
+
+  /* ================= живые данные =================
+     Свой сервер мониторинга (server.js) отдаёт /api/status и /api/stream.
+     Адрес ниже — тот, где он реально крутится. Через window.BEBRA_LIVE_API
+     можно подсунуть другой: так делают тесты в _audit/, чтобы не зависеть
+     от боевого бэкенда.
+     ------------------------------------------------------------------ */
+
+  var LIVE_API = window.BEBRA_LIVE_API || 'https://3dff945389d24a1c8f6a5bb8153c51a0.sg.agentos-app.run';
+
+  var POLL_MS = 5000;
+
+  var el = {
+    pill: $('#pill'),
+    stamp: $('#stamp'),
+    total: $('#totalNum'),
+    totalCap: $('#totalCap'),
+    heroDot: $('#heroDot'),
+    heroState: $('#heroState'),
+    jBadge: $('#jBadge'), jPlayers: $('#jPlayers'), jVer: $('#jVer'), jPing: $('#jPing'), jBar: $('#jBar'),
+    bBadge: $('#bBadge'), bPlayers: $('#bPlayers'), bVer: $('#bVer'), bPing: $('#bPing'), bBar: $('#bBar'),
+    sparkLine: $('#sparkLine'), sparkArea: $('#sparkArea'), chartNote: $('#chartNote'),
+    rec: $('#recNum')
+  };
+
+  /* Рекорд считает сам мониторинг: он сравнивает онлайн на каждом опросе,
+     в том числе когда на страницу никто не смотрит. Страница только
+     показывает насчитанное и никогда не уменьшает число — иначе при обрыве
+     связи с бэкендом рекорд «просел» бы. */
+  var bestPeak = parseInt($('#recNum').textContent, 10) || 0;
+
+  function showPeak(peak) {
+    var v = peak && peak.total;
+    if (typeof v !== 'number' || !isFinite(v) || v <= bestPeak) return;
+    bestPeak = v;
+    el.rec.textContent = num(v);
+  }
+
+  function num(n) {
+    return (n === null || n === undefined || isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU');
+  }
+
+  function plural(n) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return 'игрок';
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'игрока';
+    return 'игроков';
+  }
+
+  function timeOf(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function setBadge(node, online, hasData) {
+    node.classList.remove('ok', 'no');
+    if (!hasData) { node.textContent = 'нет данных'; return; }
+    node.classList.add(online ? 'ok' : 'no');
+    node.textContent = online ? 'онлайн' : 'не отвечает';
+  }
+
+  function fillBar(bar, online, max) {
+    if (!online || !max) { bar.style.width = '0%'; return; }
+    bar.style.width = Math.max(2, Math.min(100, (online / max) * 100)).toFixed(1) + '%';
+  }
+
+  function drawSpark(hist) {
+    if (!hist || hist.length < 2) {
+      el.chartNote.textContent = 'мало данных, накопим';
+      return;
+    }
+    var W = 600, H = 100, padTop = 8, padBot = 8;
+    var vals = hist.map(function (p) { return p.total || 0; });
+    var max = Math.max(Math.max.apply(null, vals), 4); // чтобы линия не прыгала на нуле
+
+    var step = W / (vals.length - 1);
+    var d = '';
+
+    vals.forEach(function (v, i) {
+      var x = i * step;
+      var y = H - padBot - (v / max) * (H - padTop - padBot);
+      d += (i ? ' L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    });
+
+    el.sparkLine.setAttribute('d', d);
+    el.sparkArea.setAttribute('d', d + ' L' + W + ' ' + H + ' L0 ' + H + ' Z');
+    el.chartNote.textContent = 'пик ' + max + ', точек ' + vals.length;
+  }
+
+  function render(d) {
+    if (!d || !d.ok) return;
+
+    var j = d.java || {};
+    var b = d.bedrock || {};
+
+    var jp = (j.players && j.players.online) || 0;
+    var jm = (j.players && j.players.max) || 0;
+    var bp = (b.players && b.players.online) || 0;
+    var bm = (b.players && b.players.max) || 0;
+    var total = jp + bp;
+
+    el.total.textContent = total;
+    el.totalCap.textContent = plural(total) + ' онлайн прямо сейчас';
+
+    var anyOn = j.online || b.online;
+    el.heroDot.className = 'dot ' + (anyOn ? 'on' : 'off');
+    el.heroState.textContent = anyOn
+      ? 'Онлайн: ' + total + ' ' + plural(total)
+      : 'Сервер не отвечает на пинг';
+
+    setBadge(el.jBadge, j.online, !!d.target);
+    el.jPlayers.textContent = num(jp) + (jm ? ' / ' + num(jm) : '');
+    el.jVer.textContent = j.version || '—';
+    el.jPing.textContent = j.latency ? j.latency + ' мс' : '—';
+    fillBar(el.jBar, jp, jm);
+
+    setBadge(el.bBadge, b.online, !!d.target);
+    el.bPlayers.textContent = num(bp) + (bm ? ' / ' + num(bm) : '');
+    el.bVer.textContent = b.version || '—';
+    el.bPing.textContent = b.latency ? b.latency + ' мс' : '—';
+    fillBar(el.bBar, bp, bm);
+
+    drawSpark(d.history);
+    showPeak(d.peak);
+
+    el.stamp.textContent = 'обновлено в ' + timeOf(d.updatedAt || d.now)
+      + ' · опросов ' + (d.polls || 0);
+  }
+
+  /* ---------------- соединение ---------------- */
+
+  var source = null;
+  var pollTimer = null;
+  var fails = 0;
+
+  function setPill(cls, text) {
+    el.pill.className = 'pill ' + cls;
+    el.pill.textContent = text;
+  }
+
+  function stopAll() {
+    if (source) { try { source.close(); } catch (e) {} source = null; }
+    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+  }
+
+  function offline() {
+    setPill('dead', 'мониторинг недоступен');
+    el.heroDot.className = 'dot off';
+    el.heroState.textContent = 'Статус временно не обновляется';
+    el.stamp.textContent = 'нет связи с сервером мониторинга';
+    el.total.textContent = '—';
+    el.totalCap.textContent = 'данные недоступны';
+  }
+
+  function startPolling() {
+    stopAll();
+    setPill('poll', 'обновление раз в 5 секунд');
+
+    function tick() {
+      fetch(LIVE_API + '/api/status', { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (d) { fails = 0; render(d); })
+        .catch(function () { fails += 1; if (fails >= 2) offline(); })
+        .then(function () { pollTimer = setTimeout(tick, POLL_MS); });
+    }
+    tick();
+  }
+
+  function start() {
+    if (!window.EventSource) return startPolling();
+
+    try {
+      source = new EventSource(LIVE_API + '/api/stream');
+    } catch (e) {
+      return startPolling();
+    }
+
+    var got = false;
+
+    source.onmessage = function (ev) {
+      got = true;
+      fails = 0;
+      setPill('live', 'поток, обновление в реальном времени');
+      try {
+        render(JSON.parse(ev.data));
+      } catch (e) {
+        // console.log('битый пакет', e);
+      }
+    };
+
+    source.onerror = function () {
+      // поток не поднялся — переходим на обычный опрос
+      if (!got) return startPolling();
+      fails += 1;
+      setPill('poll', 'поток отвалился, опрашиваю сам');
+      if (fails >= 3) startPolling();
+    };
+  }
+
+  start();
 })();
 </script>
+
 </body>
 </html>
