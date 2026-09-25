@@ -755,13 +755,28 @@ button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit
    помещаться в первый экран, иначе кнопки уезжают под сгиб. */
 
 @media (min-width:769px) and (max-height:980px){
-  .hero{padding:104px 24px 56px}
-  .badge{margin-bottom:26px}
-  .logo-float{margin-bottom:28px}
-  .logo-ring{width:min(290px,31vh)}
-  .hero-title{margin-bottom:16px}
-  .hero-sub{margin-bottom:26px}
-  .ip-wrap{margin-bottom:26px}
+  .hero{padding:100px 24px 48px}
+  .badge{margin-bottom:22px}
+  .logo-float{margin-bottom:22px}
+  .logo-ring{width:min(290px,30vh)}
+  .hero-title{margin-bottom:14px}
+  .hero-sub{margin-bottom:22px}
+  .ip-wrap{margin-bottom:22px}
+}
+
+/* Совсем низкие окна (1280x720, 1024x600) — ужимаем сильнее */
+@media (min-width:769px) and (max-height:820px){
+  .hero{padding:84px 24px 32px}
+  .badge{margin-bottom:14px;padding:7px 16px 7px 13px;font-size:12.5px}
+  .logo-float{margin-bottom:14px}
+  .logo-ring{width:min(200px,23vh);border-radius:26px}
+  .logo-ring img{border-radius:20px}
+  .hero-title{font-size:clamp(24px,3.4vw,38px);margin-bottom:10px}
+  .hero-sub{font-size:14.5px;line-height:1.58;margin-bottom:16px}
+  .ip-card{padding:10px 13px 10px 18px}
+  .ip-value{font-size:18px}
+  .ip-wrap{margin-bottom:16px;gap:9px}
+  .hero-buttons .btn{padding:12px 26px;font-size:14.5px}
 }
 
 /* ============ МОБИЛЬНЫЕ ============ */
