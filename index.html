@@ -254,6 +254,22 @@ html[data-theme="dark"] .tgl .i-moon { display: none; }
 
 .hero .wrap { max-width: 960px; text-align: center; }
 
+/* На широком экране текст и остров стоят рядом. В одну колонку острову
+   не хватало высоты: он ужимался до четверти ширины экрана и терялся
+   среди пустого места по бокам. */
+@media (min-width: 1100px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 500px);
+    column-gap: 36px;
+    align-items: center;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 30px var(--pad) 58px;
+  }
+  .hero .wrap { max-width: none; padding: 0; text-align: left; }
+}
+
 .tag {
   display: inline-flex;
   align-items: center;
@@ -279,14 +295,23 @@ html[data-theme="dark"] .tgl .i-moon { display: none; }
 
 .hero h1 {
   font-family: var(--font-title);
-  font-size: clamp(38px, 8.4vw, 78px);
+  font-size: clamp(30px, 8.4vw, 78px);
   letter-spacing: .5px;
   margin: 0 0 18px;
+  /* вордмарк не переносим: иначе на телефоне строка рвётся по дефису
+     и он висит в конце первой строки. Размер и так тянется от ширины. */
+  white-space: nowrap;
 }
 
 .hero h1 .b { color: var(--blue); }
 .hero h1 .y { color: var(--yellow); text-shadow: 0 2px 0 var(--yellow-dark); }
 html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
+
+/* Рядом с островом колонка текста уже, поэтому вордмарк мельче:
+   иначе он переносится и дефис висит в конце строки. */
+@media (min-width: 1100px) {
+  .hero h1 { font-size: clamp(30px, 3.6vw, 50px); }
+}
 
 .lead {
   font-size: clamp(16px, 2.2vw, 18.5px);
@@ -400,16 +425,43 @@ html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
    вслед за ним, ушёл — плавно возвращается в исходное положение.
    ---------------------------------------------------------- */
 
+/* --fit подгоняет сцену под высоту окна. На низких экранах остров иначе
+   упирался в край и обрезался по кронам — читалось как обрыв картинки.
+   Одна переменная задаёт и место под сцену, и её масштаб, поэтому
+   пропорции сохраняются на любой высоте. */
 .island {
-  --s: 26px;
+  --s: 22px;
+  --box: 520px;   /* сколько места отдано под сцену. Запас нужен не только
+                     на перспективу: силуэт несимметричен — сверху кроны,
+                     снизу конус, поэтому его середина выше центра блока */
+  --fit: 1;
+  /* общий масштаб сцены: им же меряется покачивание висящих блоков,
+     иначе на маленьких экранах они улетают выше самой сцены */
+  --k: calc(var(--fit) * var(--scale, 1));
   position: relative;
-  height: 320px;
+  height: calc(var(--box) * var(--fit));
   margin-top: 8px;
+  /* точка схода ровно по центру блока: при смещённой проекция уезжает
+     вверх, и сцена вылезает за отведённое место */
   perspective: 1500px;
-  perspective-origin: 50% 40%;
+  perspective-origin: 50% 50%;
   user-select: none;
   touch-action: pan-y;
 }
+
+/* В одну колонку остров стоит под текстом, и на низких окнах его надо
+   ужимать: иначе он упирается в край экрана и обрезается по кронам. */
+@media (max-width: 1099px) and (max-height: 900px) { .island { --fit: .80; } }
+@media (max-width: 1099px) and (max-height: 800px) { .island { --fit: .68; } }
+@media (max-width: 1099px) and (max-height: 700px) { .island { --fit: .55; } }
+@media (max-width: 1099px) and (max-height: 620px) { .island { --fit: .45; } }
+
+/* Рядом с текстом места хватает, ужимать почти не нужно */
+@media (min-width: 1100px) {
+  .island { --box: 600px; --scale: 1.36; margin-top: 0; }
+}
+@media (min-width: 1100px) and (max-height: 700px) { .island { --fit: .82; } }
+@media (min-width: 1100px) and (max-height: 600px) { .island { --fit: .62; } }
 
 .island .shadow {
   position: absolute;
@@ -419,15 +471,17 @@ html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(15, 22, 35, .26), transparent 70%);
   filter: blur(6px);
+  /* тень живёт в том же масштабе, что и сцена */
+  transform: scale(var(--k, 1));
 }
 html[data-theme="dark"] .island .shadow {
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, .62), transparent 70%);
 }
 
 .world {
-  --rx: -44deg;
+  --rx: -36deg;
   --ry: -24deg;
-  --zoom: 1.12;
+  --zoom: calc(1.12 * var(--k, 1));
   position: absolute;
   left: 50%; top: 50%;
   width: 0; height: 0;
@@ -470,12 +524,14 @@ html[data-theme="dark"] .island .shadow {
 }
 
 /* Затенение по сторонам, как в игре: верх светлее, бока темнее.
-   Через отдельный слой, а не filter — filter ломает 3D-контекст. */
+   Через отдельный слой, а не filter — filter ломает 3D-контекст.
+   --deep добавляет каждому блоку темноту по глубине: чем ниже блок,
+   тем он глуше. Без этого низ острова выглядел плоской заливкой. */
 .vx i::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, var(--shade, 0));
+  background: rgba(0, 0, 0, calc(var(--shade, 0) + var(--deep, 0)));
 }
 
 /* Грани подписаны t/n/s/e/w (верх, север, юг, восток, запад).
@@ -507,8 +563,8 @@ html[data-theme="dark"] .island .shadow {
   animation: bob 4.2s ease-in-out infinite;
 }
 @keyframes bob {
-  0%, 100% { transform: translateY(-22px); }
-  50%      { transform: translateY(-62px); }
+  0%, 100% { transform: translateY(calc(-22px * 1.12 * var(--k, 1))); }
+  50%      { transform: translateY(calc(-62px * 1.12 * var(--k, 1))); }
 }
 
 /* ================= секции ================= */
@@ -824,16 +880,18 @@ html[data-theme="dark"] .island .shadow {
   box-shadow: var(--shadow);
 }
 
+/* Иконка была бледной: светло-синий значок на светло-сером квадрате
+   почти не читался. Дали ей больше размера и контраста. */
 .f .ic {
-  width: 46px; height: 46px;
+  width: 50px; height: 50px;
   display: grid; place-items: center;
-  border-radius: 12px;
-  background: var(--bg-soft);
-  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--blue) 12%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--blue) 26%, var(--line));
   color: var(--blue);
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
-.f .ic svg { width: 23px; height: 23px; }
+.f .ic svg { width: 26px; height: 26px; stroke-width: 1.9; }
 
 .f h3 { font-size: 16.5px; margin-bottom: 8px; }
 .f p { margin: 0; color: var(--muted); font-size: 14.8px; }
@@ -1041,8 +1099,6 @@ code {
   .hero { padding: 44px 0 0; }
   .sec { padding: 58px 0; }
   .stamp { margin-left: 0; width: 100%; }
-  .island { height: 300px; }
-  .world { --zoom: 1.05; }
 }
 
 @media (max-width: 620px) {
@@ -1061,16 +1117,16 @@ code {
     grid-column: span 1;
     aspect-ratio: 16 / 10;
   }
-  .island { height: 260px; }
 }
 
-/* на низких ноутбуках первый экран не должен уезжать за границу */
-@media (max-height: 780px) and (min-width: 861px) {
+/* на низких ноутбуках первый экран не должен уезжать за границу.
+   Только для одноколоночной раскладки — рядом с текстом сцена и так
+   вписывается, и трогать размеры там не нужно. */
+@media (max-height: 780px) and (min-width: 861px) and (max-width: 1099px) {
   .hero { padding: 38px 0 0; }
   .hero h1 { font-size: clamp(34px, 5.6vw, 60px); }
   .lead { margin-bottom: 22px; }
   .hint { margin-bottom: 20px; }
-  .island { height: 330px; }
 }
 
 /* Кому анимации мешают — отключаем всё лишнее.
@@ -1635,7 +1691,9 @@ code {
     var island = document.getElementById('island');
     if (!spin || !world || !island) return;
 
-    var S = 26; // сторона блока в пикселях, совпадает с --s в CSS
+    /* Сторона блока берётся из CSS, а не дублируется числом: раньше тут
+       стояло 26, и при правке --s в стилях сцена разъезжалась. */
+    var S = parseFloat(getComputedStyle(island).getPropertyValue('--s')) || 22;
 
     /* ---------------- текстуры ---------------- */
 
@@ -1794,23 +1852,42 @@ code {
       island.style.setProperty('--t-' + name, texURI(TEX[name](rng(seed++))));
     });
 
-    /* ---------------- рельеф ---------------- */
+    /* ---------------- рельеф ----------------
+       Остров собирается в два приёма: сверху бугристый рельеф, снизу
+       конус, сходящийся к острию. Раньше низ шёл вниз одинаковой ширины,
+       и остров читался плоской плитой, а не куском земли в воздухе. */
 
-    var N = 7;      // сетка 7x7
-    var HALF = 3;   // центр
+    var N = 9;       // сетка 9x9
+    var HALF = 4;    // центр
+    var R = 5.4;     // радиус острова в блоках
 
-    /* силуэт: квадрат со срезанными углами, иначе читается как куб */
-    function inShape(x, z) {
-      var cx = Math.min(x, N - 1 - x);
-      var cz = Math.min(z, N - 1 - z);
-      return cx + cz >= 1;
+    /* Ровный круг выглядит отливкой, поэтому край рваный. Сдвиг считается
+       от координат, а не случайно: при каждой загрузке силуэт одинаковый. */
+    function hash(x, z) {
+      var h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+      return h - Math.floor(h);
     }
 
-    /* Два холма. Спадают по косинусу — вершина выходит округлой,
-       а не ступенькой, как от прямого вычитания. */
+    /* Пруд стоит у края — оттуда вода уходит вниз. Его клетки держим
+       в силуэте принудительно: иначе ручей однажды окажется за бортом. */
+    var POND = [[6, 6], [7, 6], [6, 7], [7, 7]];
+    var SPILL = [8, 7];
+    var wet = {};
+    POND.concat([SPILL]).forEach(function (p) { wet[p[0] + ',' + p[1]] = true; });
+
+    function inShape(x, z) {
+      if (wet[x + ',' + z]) return true;
+      var dx = x - HALF, dz = z - HALF;
+      var d = Math.sqrt(dx * dx + dz * dz);
+      return d <= R - 0.45 + hash(x, z) * 0.9;
+    }
+
+    /* Три холма: большой, средний и пригорок. Спадают по косинусу —
+       вершина выходит округлой, а не ступенькой. */
     var HILLS = [
-      { x: 1.8, z: 1.8, h: 3.2, r: 2.4 },
-      { x: 2.2, z: 5.2, h: 1.6, r: 1.8 }
+      { x: 2.2, z: 2.2, h: 3.4, r: 3.0 },
+      { x: 2.0, z: 6.4, h: 1.6, r: 2.0 },
+      { x: 6.8, z: 2.2, h: 1.3, r: 1.8 }
     ];
 
     function landH(x, z) {
@@ -1820,13 +1897,10 @@ code {
         var d = Math.sqrt((x - H.x) * (x - H.x) + (z - H.z) * (z - H.z));
         if (d < H.r) h += H.h * Math.cos((d / H.r) * Math.PI / 2);
       }
-      return Math.round(h);
+      /* мелкая неровность: без неё ровные площадки выглядят залитыми */
+      if (hash(x * 3.7, z * 5.1) > 0.78) h += 0.6;
+      return Math.max(0, Math.round(h));
     }
-
-    /* Пруд лежит вровень с землёй — просто меняем материал верхнего блока,
-       никаких ям. У самого края вода срывается вниз, оттуда водопад. */
-    var POND = [[4, 4], [5, 4], [4, 5], [5, 5]];
-    var SPILL = [6, 5];
 
     var surf = {};                       // 'x,z' -> высота поверхности
     for (var z = 0; z < N; z++) {
@@ -1834,8 +1908,8 @@ code {
         if (inShape(x, z)) surf[x + ',' + z] = landH(x, z);
       }
     }
-    POND.forEach(function (p) { surf[p[0] + ',' + p[1]] = 0; });
-    surf[SPILL[0] + ',' + SPILL[1]] = 0;
+    /* пруд и ручей — вровень с землёй, никаких ям */
+    POND.concat([SPILL]).forEach(function (p) { surf[p[0] + ',' + p[1]] = 0; });
 
     var pondSet = {}, sandSet = {};
     POND.concat([SPILL]).forEach(function (p) {
@@ -1853,14 +1927,21 @@ code {
 
     var r = rng(4242);
 
+    /* Глубина низа под клеткой: на краю почти ничего, в центре длинный
+       конус. Именно это превращает плиту в парящий остров. Формула важна:
+       раньше глубина падала только у самого края, и бока получались
+       вертикальными стенами — остров читался коробкой. */
+    var DEEP = 7;    // насколько глубоко низ уходит под центром
+    function coneDepth(d) {
+      var t = Math.max(0, 1 - d / R);
+      return Math.max(1, Math.round(Math.pow(t, 0.8) * DEEP));
+    }
+
     Object.keys(surf).forEach(function (k2) {
       var p = k2.split(',');
       var x = +p[0], z = +p[1];
       var top = -surf[k2];
       var d = Math.sqrt((x - HALF) * (x - HALF) + (z - HALF) * (z - HALF));
-
-      /* низ сходится конусом — так остров читается как парящий, а не как срез */
-      var deep = Math.max(1, Math.round((4.0 - d) * 1.3));
 
       /* обрыв: если сосед заметно ниже, верхние блоки — голый камень */
       var steep = false;
@@ -1873,16 +1954,17 @@ code {
       var body = cap === 'stone' ? 'stone'
                : (cap === 'water' || cap === 'sand') ? 'sand' : 'dirt';
 
-      for (var y = top; y < top + deep; y++) {
+      var deep = coneDepth(d);
+      for (var y = top; y <= top + deep; y++) {
         setC(x, y, z, y === top ? cap
-                       : y <= top + 2 ? body
-                       : (r() < 0.15 ? 'copper' : 'stone'));
+                     : y <= top + 2 ? body
+                     : (r() < 0.1 ? 'copper' : 'stone'));
       }
     });
 
     /* ---------------- дубы ----------------
-       Ствол оставляем открытым: в прошлой версии крона начиналась
-       от самой земли, и дерево сливалось с газоном. */
+       Ствол оставляем открытым, крону кладём тремя слоями и срезаем углы —
+       так дерево читается дубом, а не зелёным кубом. */
 
     function oak(cx, cz, trunkH, rad) {
       var base = surf[cx + ',' + cz];
@@ -1892,30 +1974,50 @@ code {
       for (var t = 1; t <= trunkH; t++) setC(cx, top - t, cz, 'log');
 
       var head = top - trunkH;
-      function ring(cy, rr) {
+      function put(x, y, z) {
+        if (getC(x, y, z)) return;            // ствол не затираем
+        setC(x, y, z, 'leaves');
+      }
+      function layer(cy, rr) {
         for (var ax = -rr; ax <= rr; ax++) {
           for (var az = -rr; az <= rr; az++) {
-            if (rr === 2 && Math.abs(ax) === 2 && Math.abs(az) === 2) continue;
-            if (getC(cx + ax, cy, cz + az)) continue;   // ствол не затираем
-            setC(cx + ax, cy, cz + az, 'leaves');
+            if (Math.abs(ax) === rr && Math.abs(az) === rr) continue;
+            put(cx + ax, cy, cz + az);
           }
         }
       }
 
-      ring(head, rad);
-      ring(head - 1, rad);
-      if (rad > 1) ring(head - 2, 1);
-      var capY = head - (rad > 1 ? 3 : 2);
-      if (!getC(cx, capY, cz)) setC(cx, capY, cz, 'leaves');
+      layer(head, rad);
+      layer(head - 1, rad);
+      put(cx, head - 2, cz);
     }
 
-    oak(5, 1, 3, 2);   // раскидистый, у дальнего края
-    oak(0, 5, 3, 1);   // поменьше, у воды
+    oak(2, 2, 2, 1);   // на большом холме
+    oak(1, 6, 2, 1);   // у воды
+    oak(7, 2, 2, 1);   // на пригорке справа
+    oak(5, 8, 2, 1);   // у южного края
+
+    /* кустики: заполняют голую траву, иначе поверхность выглядит пустой */
+    function bush(cx, cz) {
+      var base = surf[cx + ',' + cz];
+      if (base === undefined) return;
+      var top = -base;
+      [[0, 0], [1, 0], [0, 1]].forEach(function (o) {
+        if (!getC(cx + o[0], top - 1, cz + o[1])) setC(cx + o[0], top - 1, cz + o[1], 'leaves');
+      });
+    }
+    bush(4, 2);
+    bush(3, 6);
 
     /* ---------------- водопад ----------------
-       Вода уходит за борт острова и падает в пустоту. */
+       Вода уходит с края вниз. Раньше это был короткий обрубок, торчащий
+       из земли, — читался как синяя палка. Теперь поток идёт ниже низа
+       острова, поэтому видно, что он падает, а не упирается в воздух. */
 
-    for (var wy = 0; wy <= 3; wy++) setC(SPILL[0], wy, SPILL[1], 'water');
+    var sd = Math.sqrt((SPILL[0] - HALF) * (SPILL[0] - HALF) +
+                       (SPILL[1] - HALF) * (SPILL[1] - HALF));
+    var fallBottom = coneDepth(sd) + 3;
+    for (var wy = 0; wy <= fallBottom; wy++) setC(SPILL[0], wy, SPILL[1], 'water');
 
     /* ---------------- сборка ----------------
        Грань рисуем только там, где за ней пусто. Без этого на острове
@@ -1939,6 +2041,13 @@ code {
       var b = document.createElement('div');
       b.className = 'vx ' + cells[k];
       b.style.transform = 'translate3d(' + ((x - HALF) * S) + 'px,' + (y * S) + 'px,' + ((z - HALF) * S) + 'px)';
+
+      /* Чем глубже блок под своей поверхностью, тем он темнее. Это и даёт
+         объём: без такого затенения низ острова читался плоской заливкой,
+         а верхние блоки — одинаково светлыми на любой глубине. */
+      var colTop = -(surf[x + ',' + z] || 0);
+      var depth = Math.max(0, y - colTop);
+      b.style.setProperty('--deep', Math.min(0.34, depth * 0.055).toFixed(3));
 
       DIRS.forEach(function (d) {
         if (getC(x + d.dx, y + d.dy, z + d.dz)) return;
@@ -1977,11 +2086,10 @@ code {
       frag.appendChild(holder);
     }
 
-    loneBlock('grass', -2.0, -1.8, 2.6, 0);
-    loneBlock('stone', 8.0, -3.2, 2.0, -1.4);
-    loneBlock('sand', 7.6, -1.2, 4.4, -2.6);
-    loneBlock('leaves', -1.8, -3.0, 4.4, -0.8);
-    loneBlock('log', 6.4, -4.4, 0.6, -2.0);
+    loneBlock('grass', -1.4, -2.2, 3.0, 0);
+    loneBlock('leaves', -1.0, -3.6, 5.4, -1.4);
+    loneBlock('stone', 9.8, -2.8, 3.2, -2.4);
+    loneBlock('sand', 9.0, -1.2, 1.2, -0.8);
 
     spin.appendChild(frag);
 
@@ -1990,7 +2098,7 @@ code {
 
     /* Сцена стоит на месте. Курсор заходит на неё — наклоняется вслед
        за ним; курсор уходит за пределы — возвращается как было. */
-    var RX = -44;  // наклон по умолчанию
+    var RX = -36;  // наклон по умолчанию
     var RY = -24;  // поворот по умолчанию
 
     function rest() {
