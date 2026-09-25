@@ -87,6 +87,19 @@ button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit
   padding:0 24px;
 }
 
+/* ============ ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ============ */
+/* Блок стоит ДО компонентов: у .card:hover и .reveal.visible одинаковая
+   специфичность, поэтому побеждает правило, написанное ниже. Плюс анимация
+   появления идёт через отдельное свойство translate — оно не конфликтует
+   с transform, который использует hover-подъём карточек. */
+
+.reveal{
+  opacity:0;
+  translate:0 30px;
+  transition:opacity .75s cubic-bezier(.2,.7,.3,1), translate .75s cubic-bezier(.2,.7,.3,1);
+}
+.reveal.visible{opacity:1;translate:0 0}
+
 /* ============ ЛОГОТИПЫ ============ */
 
 .logo-fallback{
@@ -400,7 +413,12 @@ button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit
   border-radius:var(--radius);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
-  transition:transform .35s cubic-bezier(.2,.7,.3,1), background .35s ease, border-color .35s ease, box-shadow .35s ease;
+  /* opacity/translate продублированы из .reveal: правило .card стоит ниже,
+     поэтому его transition перекрывает .reveal — без этого карточки
+     появлялись бы рывком, без плавного проявления. */
+  transition:opacity .75s cubic-bezier(.2,.7,.3,1), translate .75s cubic-bezier(.2,.7,.3,1),
+             transform .35s cubic-bezier(.2,.7,.3,1), background .35s ease,
+             border-color .35s ease, box-shadow .35s ease;
   will-change:transform;
 }
 .card:hover{
@@ -717,15 +735,6 @@ button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit
 }
 .toast.show{transform:translate(-50%,0);opacity:1}
 
-/* ============ ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ============ */
-
-.reveal{
-  opacity:0;
-  transform:translateY(30px);
-  transition:opacity .75s cubic-bezier(.2,.7,.3,1), transform .75s cubic-bezier(.2,.7,.3,1);
-}
-.reveal.visible{opacity:1;transform:none}
-
 /* ============ ПЛАНШЕТЫ ============ */
 
 @media (max-width:1080px){
@@ -827,7 +836,7 @@ button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit
     animation-iteration-count:1 !important;
     transition-duration:.001ms !important;
   }
-  .reveal{opacity:1;transform:none}
+  .reveal{opacity:1;translate:0 0}
 }
 </style>
 </head>
