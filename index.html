@@ -431,9 +431,13 @@ html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
    пропорции сохраняются на любой высоте. */
 .island {
   --s: 22px;
-  --box: 520px;   /* сколько места отдано под сцену. Запас нужен не только
+  --box: 580px;   /* сколько места отдано под сцену. Запас нужен не только
                      на перспективу: силуэт несимметричен — сверху кроны,
-                     снизу конус, поэтому его середина выше центра блока */
+                     снизу конус, поэтому его середина выше центра блока.
+                     И не вся высота сцены тянется за масштабом: постоянная
+                     часть около пятидесяти пикселей остаётся при любом
+                     --fit, поэтому у самого мелкого шага запас кончается
+                     первым — его и держим в уме при правке чисел ниже */
   --fit: 1;
   /* общий масштаб сцены: им же меряется покачивание висящих блоков,
      иначе на маленьких экранах они улетают выше самой сцены */
@@ -450,18 +454,25 @@ html[data-theme="dark"] .hero h1 .y { text-shadow: none; }
 }
 
 /* В одну колонку остров стоит под текстом, и на низких окнах его надо
-   ужимать: иначе он упирается в край экрана и обрезается по кронам. */
+   ужимать: иначе он упирается в край экрана и обрезается по кронам.
+   Нижние шаги специально не самые мелкие: у сцены есть постоянная часть
+   высоты, которая не тянется за масштабом, и на мелком --fit она съедает
+   весь запас снизу — остров прижимается к самому низу блока. */
 @media (max-width: 1099px) and (max-height: 900px) { .island { --fit: .80; } }
-@media (max-width: 1099px) and (max-height: 800px) { .island { --fit: .68; } }
-@media (max-width: 1099px) and (max-height: 700px) { .island { --fit: .55; } }
-@media (max-width: 1099px) and (max-height: 620px) { .island { --fit: .45; } }
+@media (max-width: 1099px) and (max-height: 800px) { .island { --fit: .70; } }
+@media (max-width: 1099px) and (max-height: 700px) { .island { --fit: .62; } }
+@media (max-width: 1099px) and (max-height: 620px) { .island { --fit: .56; } }
 
-/* Рядом с текстом места хватает, ужимать почти не нужно */
+/* Рядом с текстом места хватает, ужимать почти не нужно. Блок выше, чем
+   в одну колонку: остров стал глубже (под почвой настоящий конус породы),
+   и в прежние 600px силуэт уже не влезал — низ срезался краем блока. */
 @media (min-width: 1100px) {
-  .island { --box: 600px; --scale: 1.36; margin-top: 0; }
+  .island { --box: 700px; --scale: 1.36; margin-top: 0; }
 }
-@media (min-width: 1100px) and (max-height: 700px) { .island { --fit: .82; } }
-@media (min-width: 1100px) and (max-height: 600px) { .island { --fit: .62; } }
+@media (min-width: 1100px) and (max-height: 880px) { .island { --fit: .86; } }
+@media (min-width: 1100px) and (max-height: 800px) { .island { --fit: .74; } }
+@media (min-width: 1100px) and (max-height: 700px) { .island { --fit: .62; } }
+@media (min-width: 1100px) and (max-height: 620px) { .island { --fit: .52; } }
 
 .island .shadow {
   position: absolute;
@@ -552,6 +563,7 @@ html[data-theme="dark"] .island .shadow {
 /* просветы в листве должны читаться как тень, иначе крона сливается с травой */
 .vx.leaves { --side: #123708; --tex-top: var(--t-leaves);    --tex-side: var(--t-leaves); }
 .vx.water  { --side: #3f93d4; --tex-top: var(--t-water);     --tex-side: var(--t-water); }
+.vx.water2 { --side: #86c8ec; --tex-top: var(--t-water2);    --tex-side: var(--t-water2); }
 .vx.sand   { --side: #ded3a5; --tex-top: var(--t-sand);      --tex-side: var(--t-sand); }
 .vx.copper { --side: #7e7e7e; --tex-top: var(--t-copper);    --tex-side: var(--t-copper); }
 
@@ -1731,6 +1743,9 @@ code {
        но здесь дерево должно читаться с одного взгляда */
     var LEAF = ['#245f18', '#1c4f12', '#2c7020', '#16400e'];
     var COPPER = ['#c47a45', '#b06b3d', '#d18c57', '#a35f34'];
+    /* вода на излёте: бледнее и с просветами. Хвост потока растворяется
+       в фоне, а не обрывается плоским синим срезом */
+    var WATER2 = ['#8fd0ef', '#7cc4e8', '#a3dbf3', '#6fb9e0'];
 
     var TEX = {
       grasstop: function (r) { return noise(r, GRASS); },
@@ -1815,6 +1830,18 @@ code {
         return px;
       },
 
+      /* падающая вода: тот же рисунок, но бледнее и с просветами */
+      water2: function (r) {
+        var px = [];
+        for (var y = 0; y < PX; y++) {
+          for (var x = 0; x < PX; x++) {
+            var w = Math.sin(x * 0.9 + y * 0.5) + Math.sin(x * 0.4 - y * 0.8);
+            px.push(r() < 0.3 ? null : (w > 0.35 ? '#9ed6f2' : '#86c8ec'));
+          }
+        }
+        return px;
+      },
+
       /* медная руда: камень с вкраплениями */
       copper: function (r) {
         var px = noise(r, STONE);
@@ -1869,11 +1896,12 @@ code {
     }
 
     /* Пруд стоит у края — оттуда вода уходит вниз. Его клетки держим
-       в силуэте принудительно: иначе ручей однажды окажется за бортом. */
+       в силуэте принудительно: иначе ручей однажды окажется за бортом.
+       Струя в две клетки: одиночная читалась палкой. */
     var POND = [[6, 6], [7, 6], [6, 7], [7, 7]];
-    var SPILL = [8, 7];
+    var SPILL = [[8, 6], [8, 7]];
     var wet = {};
-    POND.concat([SPILL]).forEach(function (p) { wet[p[0] + ',' + p[1]] = true; });
+    POND.concat(SPILL).forEach(function (p) { wet[p[0] + ',' + p[1]] = true; });
 
     function inShape(x, z) {
       if (wet[x + ',' + z]) return true;
@@ -1909,10 +1937,10 @@ code {
       }
     }
     /* пруд и ручей — вровень с землёй, никаких ям */
-    POND.concat([SPILL]).forEach(function (p) { surf[p[0] + ',' + p[1]] = 0; });
+    POND.concat(SPILL).forEach(function (p) { surf[p[0] + ',' + p[1]] = 0; });
 
     var pondSet = {}, sandSet = {};
-    POND.concat([SPILL]).forEach(function (p) {
+    POND.concat(SPILL).forEach(function (p) {
       pondSet[p[0] + ',' + p[1]] = true;
       [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (n) {
         var k2 = (p[0] + n[0]) + ',' + (p[1] + n[1]);
@@ -1927,38 +1955,49 @@ code {
 
     var r = rng(4242);
 
-    /* Глубина низа под клеткой: на краю почти ничего, в центре длинный
-       конус. Именно это превращает плиту в парящий остров. Формула важна:
-       раньше глубина падала только у самого края, и бока получались
-       вертикальными стенами — остров читался коробкой. */
-    var DEEP = 7;    // насколько глубоко низ уходит под центром
-    function coneDepth(d) {
-      var t = Math.max(0, 1 - d / R);
-      return Math.max(1, Math.round(Math.pow(t, 0.8) * DEEP));
+    /* ---------------- почва и каменный низ ----------------
+       Почва по всему острову одинаковой толщины, а порода под ней сходится
+       к острию. Раньше толщина низа считалась той же формулой, что и камень,
+       и у края земли не оставалось вовсе: снизу остров заканчивался плоской
+       отрезанной плоскостью, а камень торчал под центром коротким обрубком.
+
+       Конус считаем по уровням в мировых координатах, а не по колонкам.
+       Если задавать глубину каждой колонке отдельно, получаются отдельные
+       вертикальные призмы, и силуэт снизу читается ступенчатым столбом. */
+
+    var SOIL = 3;              // трава и три блока земли под ней
+    var CONE_TOP = SOIL + 1;   // первый уровень камня на ровном месте
+    var CONE_END = 11;         // докуда доходит камень
+    var CONE_R = 6.4;          // радиус конуса у поверхности
+
+    function coneRadius(y) {
+      var t = (y - CONE_TOP) / (CONE_END - CONE_TOP);
+      return CONE_R * Math.max(0, 1 - t);
     }
 
+    /* Поверхность: трава, песок у воды, вода в пруду. Камнем крутые клетки
+       больше не помечаем: на газоне торчала россыпь серых кубиков, и это
+       читалось как мусор, а не как порода. */
     Object.keys(surf).forEach(function (k2) {
       var p = k2.split(',');
       var x = +p[0], z = +p[1];
       var top = -surf[k2];
+      var cap = pondSet[k2] ? 'water' : sandSet[k2] ? 'sand' : 'grass';
+      var body = (cap === 'water' || cap === 'sand') ? 'sand' : 'dirt';
+      for (var y = top; y <= top + SOIL; y++) setC(x, y, z, y === top ? cap : body);
+    });
+
+    /* Порода: от низа почвы до поверхности конуса. Радиус книзу только
+       убывает, поэтому проверку можно прервать на первом непопавшем
+       уровне — так перебор выходит в разы короче. */
+    Object.keys(surf).forEach(function (k2) {
+      var p = k2.split(',');
+      var x = +p[0], z = +p[1];
+      var soilBottom = -surf[k2] + SOIL;
       var d = Math.sqrt((x - HALF) * (x - HALF) + (z - HALF) * (z - HALF));
-
-      /* обрыв: если сосед заметно ниже, верхние блоки — голый камень */
-      var steep = false;
-      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (n) {
-        var nb = surf[(x + n[0]) + ',' + (z + n[1])];
-        if (nb !== undefined && surf[k2] - nb >= 2) steep = true;
-      });
-
-      var cap = pondSet[k2] ? 'water' : sandSet[k2] ? 'sand' : steep ? 'stone' : 'grass';
-      var body = cap === 'stone' ? 'stone'
-               : (cap === 'water' || cap === 'sand') ? 'sand' : 'dirt';
-
-      var deep = coneDepth(d);
-      for (var y = top; y <= top + deep; y++) {
-        setC(x, y, z, y === top ? cap
-                     : y <= top + 2 ? body
-                     : (r() < 0.1 ? 'copper' : 'stone'));
+      for (var y = soilBottom + 1; y <= CONE_END; y++) {
+        if (d > coneRadius(y)) break;
+        setC(x, y, z, r() < 0.07 ? 'copper' : 'stone');
       }
     });
 
@@ -1992,10 +2031,12 @@ code {
       put(cx, head - 2, cz);
     }
 
+    /* Деревьев три, а не четыре: на сетке в девять блоков четыре кроны
+       смыкались в одну зелёную подушку и читались кустами, а не дубами.
+       Стволы у всех видимые, кроны не соприкасаются. */
     oak(2, 2, 2, 1);   // на большом холме
-    oak(1, 6, 2, 1);   // у воды
-    oak(7, 2, 2, 1);   // на пригорке справа
-    oak(5, 8, 2, 1);   // у южного края
+    oak(6, 3, 2, 1);   // на пригорке справа
+    oak(2, 6, 2, 1);   // у среднего холма
 
     /* кустики: заполняют голую траву, иначе поверхность выглядит пустой */
     function bush(cx, cz) {
@@ -2006,18 +2047,26 @@ code {
         if (!getC(cx + o[0], top - 1, cz + o[1])) setC(cx + o[0], top - 1, cz + o[1], 'leaves');
       });
     }
-    bush(4, 2);
-    bush(3, 6);
+    bush(4, 5);
 
     /* ---------------- водопад ----------------
-       Вода уходит с края вниз. Раньше это был короткий обрубок, торчащий
-       из земли, — читался как синяя палка. Теперь поток идёт ниже низа
-       острова, поэтому видно, что он падает, а не упирается в воздух. */
+       Вода уходит с края вниз. Полотно сужается книзу, а последние блоки
+       идут бледной текстурой с просветами: хвост потока растворяется.
+       Раньше это была колонна с плоским синим срезом на конце — читалась
+       как доска, торчащая из острова. */
 
-    var sd = Math.sqrt((SPILL[0] - HALF) * (SPILL[0] - HALF) +
-                       (SPILL[1] - HALF) * (SPILL[1] - HALF));
-    var fallBottom = coneDepth(sd) + 3;
-    for (var wy = 0; wy <= fallBottom; wy++) setC(SPILL[0], wy, SPILL[1], 'water');
+    SPILL.forEach(function (sp, si) {
+      var sd = Math.sqrt((sp[0] - HALF) * (sp[0] - HALF) + (sp[1] - HALF) * (sp[1] - HALF));
+      var stone = CONE_TOP;
+      while (stone < CONE_END && sd <= coneRadius(stone + 1)) stone++;
+      var bottom = stone + 4;              // поток уходит ниже камня
+
+      for (var wy = 0; wy <= bottom; wy++) {
+        /* вторая струя короче: вдвоём до самого низа поток выглядит плитой */
+        if (si === 1 && wy > bottom - 3) break;
+        setC(sp[0], wy, sp[1], wy > bottom - 4 ? 'water2' : 'water');
+      }
+    });
 
     /* ---------------- сборка ----------------
        Грань рисуем только там, где за ней пусто. Без этого на острове
@@ -2038,21 +2087,33 @@ code {
     Object.keys(cells).forEach(function (k) {
       var p = k.split('|');
       var x = +p[0], y = +p[1], z = +p[2];
+
+      /* Сначала выясняем, какие грани вообще видно. Блок, зажатый со всех
+         сторон, не видно никак, а это лишний элемент с трансформацией:
+         после того как под островом появился конус, внутренних блоков
+         стало больше половины, и без этой отсечки на сцену набегает
+         несколько сотен пустых div'ов — браузер их честно раскладывает. */
+      var open = [];
+      DIRS.forEach(function (d) {
+        if (!getC(x + d.dx, y + d.dy, z + d.dz)) open.push(d.cls);
+      });
+      if (!open.length) return;
+
       var b = document.createElement('div');
       b.className = 'vx ' + cells[k];
       b.style.transform = 'translate3d(' + ((x - HALF) * S) + 'px,' + (y * S) + 'px,' + ((z - HALF) * S) + 'px)';
 
       /* Чем глубже блок под своей поверхностью, тем он темнее. Это и даёт
          объём: без такого затенения низ острова читался плоской заливкой,
-         а верхние блоки — одинаково светлыми на любой глубине. */
+         а верхние блоки — одинаково светлыми на любой глубине. Шаг подобран
+         так, чтобы камень успевал темнеть до самого острия конуса. */
       var colTop = -(surf[x + ',' + z] || 0);
       var depth = Math.max(0, y - colTop);
-      b.style.setProperty('--deep', Math.min(0.34, depth * 0.055).toFixed(3));
+      b.style.setProperty('--deep', Math.min(0.34, depth * 0.038).toFixed(3));
 
-      DIRS.forEach(function (d) {
-        if (getC(x + d.dx, y + d.dy, z + d.dz)) return;
+      open.forEach(function (cls) {
         var i = document.createElement('i');
-        i.className = d.cls;
+        i.className = cls;
         b.appendChild(i);
         faces++;
       });
