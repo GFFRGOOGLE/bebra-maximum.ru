@@ -2207,14 +2207,25 @@ code {
     var bm = (b.players && b.players.max) || 0;
     var total = jp + bp;
 
-    el.total.textContent = total;
-    el.totalCap.textContent = plural(total) + ' онлайн прямо сейчас';
+    /* Бэкенд перезапускается, и сразу после старта первый опрос ещё идёт:
+       java и bedrock приходят как null, а updatedAt пустой. В это время
+       нельзя ни показывать ноль, ни говорить «не отвечает на пинг» — мы
+       этого ещё не знаем. Ноль тут означал бы «сервер пустой», хотя на
+       самом деле мы просто не успели спросить. */
+    var known = !!d.updatedAt;
+    var anyOn = !!(j.online || b.online);
 
-    var anyOn = j.online || b.online;
+    el.total.textContent = known ? num(total) : '—';
+    el.totalCap.textContent = known
+      ? plural(total) + ' онлайн прямо сейчас'
+      : 'ждём первый ответ';
+
     el.heroDot.className = 'dot ' + (anyOn ? 'on' : 'off');
-    el.heroState.textContent = anyOn
-      ? 'Онлайн: ' + total + ' ' + plural(total)
-      : 'Сервер не отвечает на пинг';
+    el.heroState.textContent = !known
+      ? 'Проверяю, как дела на сервере…'
+      : anyOn
+        ? 'Онлайн: ' + total + ' ' + plural(total)
+        : 'Сервер не отвечает на пинг';
 
     setBadge(el.jBadge, j.online, !!d.target);
     el.jPlayers.textContent = num(jp) + (jm ? ' / ' + num(jm) : '');
@@ -2231,9 +2242,13 @@ code {
     showPeak(d.peak);
 
     /* Время последнего обновления и в тексте, и в атрибуте: по тексту его
-       неудобно сравнивать — минута меняется раз в шестьдесят секунд. */
+       неудобно сравнивать — минута меняется раз в шестьдесят секунд.
+       Пока опроса не было, честнее сказать «ждём»: «обновлено» про данные,
+       которых ещё нет, — неправда. */
     var at = d.updatedAt || d.now;
-    el.stamp.textContent = 'обновлено в ' + timeOf(at);
+    el.stamp.textContent = d.updatedAt
+      ? 'обновлено в ' + timeOf(d.updatedAt)
+      : 'ждём первый ответ';
     el.stamp.setAttribute('data-updated', String(at || ''));
   }
 
