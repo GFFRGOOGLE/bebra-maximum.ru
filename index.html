@@ -139,11 +139,6 @@ h1, h2, h3 { line-height: 1.14; margin: 0; }
   z-index: 1;
 }
 
-.sr {
-  position: absolute; width: 1px; height: 1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
-}
-
 :focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 3px;
@@ -806,6 +801,15 @@ html[data-theme="dark"] .island .shadow {
 .shot.w3 { grid-column: span 3; aspect-ratio: 4 / 3; }
 .shot.w6 { grid-column: span 6; aspect-ratio: 21 / 6; }
 
+/* Плитка открывается и с клавиатуры, поэтому у неё должен быть видимый
+   фокус. Общее правило :focus-visible ставит радиус 6px — на плитке это
+   перебило бы её собственную форму, поэтому радиус возвращаем свой. */
+.shot:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+
 /* просмотр фото во весь экран */
 .lb {
   position: fixed;
@@ -833,6 +837,10 @@ html[data-theme="dark"] .island .shadow {
   font-size: 14px;
   margin: 0;
 }
+
+/* Фокус переносится на диалог программно — рамка вокруг всего экрана
+   тут не нужна, про закрытие говорит подпись. */
+.lb:focus { outline: none; }
 
 /* ================= карточки-фичи ================= */
 
@@ -1270,23 +1278,23 @@ code {
     </div>
 
     <div class="gal">
-      <figure class="shot w4 rv">
+      <figure class="shot w4 rv" tabindex="0" role="button" aria-label="Открыть фото: Постройки игроков">
         <img src="img/builds.jpg" alt="Дома и вишнёвые деревья" loading="lazy">
         <figcaption>Постройки игроков</figcaption>
       </figure>
-      <figure class="shot w2 rv">
+      <figure class="shot w2 rv" tabindex="0" role="button" aria-label="Открыть фото: Крепость у воды">
         <img src="img/fortress.jpg" alt="Каменная стена с фонарями у воды" loading="lazy">
         <figcaption>Крепость у воды</figcaption>
       </figure>
-      <figure class="shot w3 rv">
+      <figure class="shot w3 rv" tabindex="0" role="button" aria-label="Открыть фото: Спавн">
         <img src="img/spawn.jpg" alt="Вид на спавн снизу" loading="lazy">
         <figcaption>Спавн</figcaption>
       </figure>
-      <figure class="shot w3 rv">
+      <figure class="shot w3 rv" tabindex="0" role="button" aria-label="Открыть фото: Статуи на спавне">
         <img src="img/spawn-top.jpg" alt="Статуи наверху спавна" loading="lazy">
         <figcaption>Статуи на спавне</figcaption>
       </figure>
-      <figure class="shot w6 rv">
+      <figure class="shot w6 rv" tabindex="0" role="button" aria-label="Открыть фото: Закат над саванной">
         <img src="img/sunset.jpg" alt="Закат над саванной" loading="lazy">
         <figcaption>Закат над саванной</figcaption>
       </figure>
@@ -1496,7 +1504,7 @@ code {
   </div>
 </footer>
 
-<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр фотографии">
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр фотографии" tabindex="-1">
   <img id="lbImg" src="" alt="">
   <p id="lbCap"></p>
 </div>
@@ -1597,26 +1605,50 @@ code {
   var lb = $('#lb');
   var lbImg = $('#lbImg');
   var lbCap = $('#lbCap');
+  var openedFrom = null;   /* плитка, откуда открыли — к ней же вернём фокус */
+
+  function openLb(fig) {
+    var img = fig.querySelector('img');
+    var cap = fig.querySelector('figcaption');
+    lbImg.setAttribute('src', img.getAttribute('src'));
+    lbImg.setAttribute('alt', img.getAttribute('alt') || '');
+    lbCap.textContent = cap ? cap.textContent : '';
+    lb.classList.add('open');
+    /* Фокус уводим в диалог: иначе он остаётся на плитке под затемнением,
+       и непонятно, что вообще открылось. */
+    openedFrom = fig;
+    lb.focus();
+  }
 
   function closeLb() {
     lb.classList.remove('open');
     lbImg.setAttribute('src', '');
+    /* Возвращаем фокус на место: иначе он падает в начало страницы
+       и до галереи приходится идти заново. */
+    if (openedFrom) { openedFrom.focus(); openedFrom = null; }
   }
 
   [].forEach.call(document.querySelectorAll('.shot'), function (fig) {
-    fig.addEventListener('click', function () {
-      var img = fig.querySelector('img');
-      var cap = fig.querySelector('figcaption');
-      lbImg.setAttribute('src', img.getAttribute('src'));
-      lbImg.setAttribute('alt', img.getAttribute('alt') || '');
-      lbCap.textContent = cap ? cap.textContent : '';
-      lb.classList.add('open');
+    fig.addEventListener('click', function () { openLb(fig); });
+    /* Enter и пробел — то же, что клик: плитка объявлена кнопкой,
+       и открывать её надо так же. */
+    fig.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        openLb(fig);
+      }
     });
   });
 
   lb.addEventListener('click', closeLb);
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && lb.classList.contains('open')) closeLb();
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') { closeLb(); return; }
+    /* Диалог объявлен модальным (aria-modal), значит фокус не должен
+       уезжать за него: иначе Tab уводит на элементы под затемнением,
+       и человек оказывается «вне» открытого фото. Фокусировать внутри
+       нечего — картинка и подпись, — поэтому просто держим фокус здесь. */
+    if (e.key === 'Tab') { e.preventDefault(); lb.focus(); }
   });
 
   /* ================= 3D-сцена =================
