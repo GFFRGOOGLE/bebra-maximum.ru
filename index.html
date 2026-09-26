@@ -562,16 +562,17 @@ html[data-theme="dark"] .island .shadow {
 .vx.sand   { --side: #ded3a5; --tex-top: var(--t-sand);      --tex-side: var(--t-sand); }
 .vx.copper { --side: #7e7e7e; --tex-top: var(--t-copper);    --tex-side: var(--t-copper); }
 
-/* блоки, которые висят в воздухе и покачиваются */
+/* блоки, которые висят в воздухе */
 .fl { position: absolute; transform-style: preserve-3d; }
-.fl .bob {
+.fl .float {
   position: absolute;
   transform-style: preserve-3d;
-  animation: bob 4.2s ease-in-out infinite;
-}
-@keyframes bob {
-  0%, 100% { transform: translateY(calc(-22px * 1.12 * var(--k, 1))); }
-  50%      { transform: translateY(calc(-62px * 1.12 * var(--k, 1))); }
+  /* Стоят на месте. Раньше покачивались, но любое движение внутри объёмной
+     сцены заставляет браузер перерисовывать все 606 граней: замер показал
+     55 мс на кадр, то есть страница жила на 18 кадрах в секунду и заикалась,
+     даже когда её никто не трогал. Смещение оставлено тем, что было серединой
+     покачивания, поэтому вид не изменился. */
+  transform: translateY(calc(-42px * 1.12 * var(--k, 1)));
 }
 
 /* ================= секции ================= */
@@ -1133,7 +1134,6 @@ code {
    Мигающий курсор и тост оставляем, они не раздражают. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .fl .bob { animation: none; }
   .world { transition: none; }
   .rv { opacity: 1; translate: none; transition: none; }
   .card, .f, .st, .soc, .btn, .tgl, .shot { transition: none; }
@@ -2091,7 +2091,7 @@ code {
     });
 
     /* пара блоков висит рядом с островом */
-    function loneBlock(kind, x, dy, z, delay) {
+    function loneBlock(kind, x, dy, z) {
       var holder = document.createElement('div');
       holder.className = 'fl';
       /* центр сетки вычитаем так же, как у блоков острова, иначе
@@ -2099,9 +2099,8 @@ code {
       holder.style.transform = 'translate3d(' + ((x - HALF) * S) + 'px,'
                              + (dy * S) + 'px,' + ((z - HALF) * S) + 'px)';
 
-      var bob = document.createElement('div');
-      bob.className = 'bob';
-      bob.style.animationDelay = delay + 's';
+      var lift = document.createElement('div');
+      lift.className = 'float';
 
       var b = document.createElement('div');
       b.className = 'vx ' + kind;
@@ -2111,15 +2110,15 @@ code {
         b.appendChild(i);
       });
 
-      bob.appendChild(b);
-      holder.appendChild(bob);
+      lift.appendChild(b);
+      holder.appendChild(lift);
       frag.appendChild(holder);
     }
 
-    loneBlock('grass', -1.4, -2.2, 3.0, 0);
-    loneBlock('leaves', -1.0, -3.6, 5.4, -1.4);
-    loneBlock('stone', 9.8, -2.8, 3.2, -2.4);
-    loneBlock('sand', 9.0, -1.2, 1.2, -0.8);
+    loneBlock('grass', -1.4, -2.2, 3.0);
+    loneBlock('leaves', -1.0, -3.6, 5.4);
+    loneBlock('stone', 9.8, -2.8, 3.2);
+    loneBlock('sand', 9.0, -1.2, 1.2);
 
     spin.appendChild(frag);
 
@@ -2131,28 +2130,55 @@ code {
     var RX = -36;  // наклон по умолчанию
     var RY = -24;  // поворот по умолчанию
 
+    /* Наклон задаём прямо в transform, а НЕ через переменные --rx/--ry.
+       Переменная на контейнере наследуется, поэтому её смена заставляет
+       браузер пересчитать стили всего поддерева — а тут 342 блока и 606
+       граней. Замер: один такой пересчёт занимал около 100 мс, то есть
+       десять наклонов в секунду и полный ступор на каждое движение мыши.
+       У transform цена — только сам элемент. */
+    function setTilt(rx, ry) {
+      world.style.transform = 'translate(-50%, -50%) rotateX(' + rx.toFixed(2) +
+        'deg) rotateY(' + ry.toFixed(2) + 'deg) scale(var(--zoom))';
+    }
+
     function rest() {
       world.classList.remove('tracking');
-      world.style.setProperty('--rx', RX + 'deg');
-      world.style.setProperty('--ry', RY + 'deg');
+      setTilt(RX, RY);
     }
 
     rest();
 
     if (island && window.matchMedia('(hover: hover)').matches) {
+      var tracking = false, queued = false, px = 0, py = 0;
+
+      /* Не больше одного пересчёта на кадр: мышь шлёт движения сотнями в
+         секунду, а браузер всё равно успевает нарисовать 60 кадров —
+         остальные пересчёты ушли бы впустую. */
+      function apply() {
+        queued = false;
+        if (!tracking) return;
+        var r = island.getBoundingClientRect();   // один раз на кадр, не на событие
+        var nx = (px - r.left) / r.width - .5;    // -0.5 … 0.5
+        var ny = (py - r.top) / r.height - .5;
+        setTilt(RX - ny * 32, RY + nx * 52);
+      }
+
       island.addEventListener('pointerenter', function () {
+        tracking = true;
         world.classList.add('tracking');
       });
 
       island.addEventListener('pointermove', function (e) {
-        var r = island.getBoundingClientRect();
-        var nx = (e.clientX - r.left) / r.width - .5;   // -0.5 … 0.5
-        var ny = (e.clientY - r.top) / r.height - .5;
-        world.style.setProperty('--rx', (RX - ny * 32).toFixed(2) + 'deg');
-        world.style.setProperty('--ry', (RY + nx * 52).toFixed(2) + 'deg');
+        px = e.clientX; py = e.clientY;
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(apply);
       });
 
-      island.addEventListener('pointerleave', rest);
+      island.addEventListener('pointerleave', function () {
+        tracking = false;
+        rest();
+      });
     }
   })();
 
