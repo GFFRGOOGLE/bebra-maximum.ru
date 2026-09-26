@@ -6,7 +6,7 @@
 <title>BEBRA-MAXIMUM — Minecraft сервер Java и Bedrock</title>
 <meta name="description" content="BEBRA-MAXIMUM — кросс-платформенный Minecraft сервер. Java и Bedrock в одном мире: медные данжи и особые ключи. Без доната и китов.">
 <meta name="theme-color" content="#f2f4f9">
-<link rel="icon" href="logo-square.jpg">
+<link rel="icon" href="logo-square.jpg" type="image/jpeg" sizes="192x192">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BEBRA-MAXIMUM">
 <meta property="og:locale" content="ru_RU">
@@ -16,6 +16,13 @@
 <!-- Ссылку на картинку соцсети тянут сами, поэтому адрес нужен полный,
      а не относительный: с относительным превью просто не появится. -->
 <meta property="og:image" content="https://gffrgoogle.github.io/bebra-maximum.ru/img/builds.jpg">
+<!-- Размеры превью нужны отдельно: без них часть соцсетей показывает
+     ссылку без картинки, пока не скачает её и не измерит сама, а это
+     только при повторном разборе. Сервер продвигают через VK, Telegram
+     и Discord — там первое впечатление и терялось бы. -->
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="642">
+<meta property="og:image:alt" content="Постройки игроков на сервере BEBRA-MAXIMUM">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1175,6 +1182,7 @@ code {
   </div>
 </header>
 
+<main>
 <!-- ================= первый экран ================= -->
 <section class="hero" id="top">
   <div class="wrap">
@@ -1490,6 +1498,7 @@ code {
     </div>
   </div>
 </section>
+</main>
 
 <!-- ================= футер ================= -->
 <footer class="foot">
